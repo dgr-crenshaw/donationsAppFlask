@@ -17,13 +17,13 @@ dateTime = now.strftime("%m/%d/%Y")
 titleHeader = "66 West"
 
 def get_db_connection():
-    conn = sqlite3.connect('faciityDB.db')
+    conn = sqlite3.connect('/home/dgrCrenshaw/donationsAppFlask/facilityDB.db')
     conn.row_factory = sqlite3.Row
     return conn
 
 def get_id(item_id):
     conn = get_db_connection()
-    item = conn.execute('SELECT * FROM faciityDBInventory WHERE id = ?',(item_id,)).fetchone()
+    item = conn.execute('SELECT * FROM facilityDBInventory WHERE id = ?',(item_id,)).fetchone()
     conn.close()
     if item is None:
         abort(404)
@@ -60,20 +60,20 @@ def index():
 @app.route('/shop')
 def shop():
     conn = get_db_connection()
-    faciityDBInventory = conn.execute('SELECT * FROM faciityDBInventory').fetchall()
-    faciityDBCategory = conn.execute('SELECT * FROM faciityDBCategories').fetchall()
+    facilityDBInventory = conn.execute('SELECT * FROM facilityDBInventory').fetchall()
+    facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
     conn.close()
-    return render_template('shop.html', faciityDBInventory=faciityDBInventory,faciityDBCategory=faciityDBCategory)
+    return render_template('shop.html', facilityDBInventory=facilityDBInventory,facilityDBCategory=facilityDBCategory)
 
 ##### Admin tools #####
 
 @app.route('/admin')
 def admin():
     conn = get_db_connection()
-    faciityDBInventory = conn.execute('SELECT * FROM faciityDBInventory').fetchall()
-    faciityDBCategory = conn.execute('SELECT * FROM faciityDBCategories').fetchall()
+    facilityDBInventory = conn.execute('SELECT * FROM facilityDBInventory').fetchall()
+    facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
     conn.close()
-    return render_template('admin.html', faciityDBInventory=faciityDBInventory,faciityDBCategory=faciityDBCategory)
+    return render_template('admin.html', facilityDBInventory=facilityDBInventory,facilityDBCategory=facilityDBCategory)
 
 # Create
 @app.route('/create', methods=('GET', 'POST'))
@@ -84,15 +84,15 @@ def create():
         newHave = request.form['have']
         newNeed = request.form['goal']
         conn = get_db_connection()
-        conn.execute('INSERT INTO faciityDBInventory (category, item, have, goal) VALUES (?, ?, ?, ?)',(newCategory, newItem, newHave, newNeed))
+        conn.execute('INSERT INTO facilityDBInventory (category, item, have, goal) VALUES (?, ?, ?, ?)',(newCategory, newItem, newHave, newNeed))
         conn.commit()
         conn.close()
         return redirect(url_for('admin'))
     else:
         conn = get_db_connection()
-        faciityDBCategory = conn.execute('SELECT * FROM faciityDBCategories').fetchall()
+        facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
         conn.close()
-        return render_template('create.html',faciityDBCategory=faciityDBCategory)
+        return render_template('create.html',facilityDBCategory=facilityDBCategory)
 
 # Add New Category
 @app.route('/add_category', methods=('GET', 'POST'))
@@ -100,23 +100,23 @@ def add_category():
     if request.method == 'POST':
         newCategory = request.form['category']
         conn = get_db_connection()
-        conn.execute('INSERT INTO faciityDBCategories (category) VALUES (?)',(newCategory,))
+        conn.execute('INSERT INTO facilityDBCategories (category) VALUES (?)',(newCategory,))
         conn.commit()
         conn.close()
         return redirect(url_for('create'))
 
     elif request.method == 'GET':
         conn = get_db_connection()
-        faciityDBCategory = conn.execute('SELECT * FROM faciityDBCategories').fetchall()
+        facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
         conn.close()
-        return render_template('add_category.html',faciityDBCategory=faciityDBCategory)
+        return render_template('add_category.html',facilityDBCategory=facilityDBCategory)
 
 @app.route('/categories')
 def categories():
     conn = get_db_connection()
-    faciityDBCategory = conn.execute('SELECT * FROM faciityDBCategories').fetchall()
+    facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
     conn.close()
-    return render_template('categories.html', faciityDBCategory=faciityDBCategory)
+    return render_template('categories.html', facilityDBCategory=facilityDBCategory)
 
 @app.route('/delete_empty_category', methods=('GET', 'POST'))
 def delete_empty_category():
@@ -125,11 +125,11 @@ def delete_empty_category():
         toDelete = [category for category in zip(*[iter(toDelete)])]
 
         conn = get_db_connection()
-        conn.executemany('DELETE FROM faciityDBCategories WHERE category = ?', (toDelete))
+        conn.executemany('DELETE FROM facilityDBCategories WHERE category = ?', (toDelete))
         conn.commit()
 
-        checkInventory = conn.execute('SELECT category FROM faciityDBInventory').fetchall()
-        checkCategories = conn.execute('SELECT category FROM faciityDBCategories').fetchall()
+        checkInventory = conn.execute('SELECT category FROM facilityDBInventory').fetchall()
+        checkCategories = conn.execute('SELECT category FROM facilityDBCategories').fetchall()
         conn.close()
 
         deduplicatedCheckInventory = list(set(checkInventory))
@@ -140,8 +140,8 @@ def delete_empty_category():
         return render_template('delete_empty_category.html', emptyCategoryList=emptyCategoryList)
     else:
         conn = get_db_connection()
-        checkInventory = conn.execute('SELECT category FROM faciityDBInventory').fetchall()
-        checkCategories = conn.execute('SELECT category FROM faciityDBCategories').fetchall()
+        checkInventory = conn.execute('SELECT category FROM facilityDBInventory').fetchall()
+        checkCategories = conn.execute('SELECT category FROM facilityDBCategories').fetchall()
         conn.close()
 
         deduplicatedCheckInventory = list(set(checkInventory))
@@ -152,15 +152,15 @@ def delete_empty_category():
 @app.route('/inventory')
 def inventory():
     conn = get_db_connection()
-    faciityDBInventory = conn.execute('SELECT * FROM faciityDBInventory').fetchall()
+    facilityDBInventory = conn.execute('SELECT * FROM facilityDBInventory').fetchall()
     conn.close()
-    return render_template('inventory.html', faciityDBInventory=faciityDBInventory)
+    return render_template('inventory.html', facilityDBInventory=facilityDBInventory)
 
 @app.route('/<int:id>/delete', methods=('POST',))
 def delete(id):
     itemID = get_id(id)
     conn = get_db_connection()
-    conn.execute('DELETE FROM faciityDBInventory WHERE id=? ',(id,))
+    conn.execute('DELETE FROM facilityDBInventory WHERE id=? ',(id,))
     conn.commit()
     conn.close()
     flash('"{}" successfully deleted!'.format(itemID['item']),'info')
@@ -170,7 +170,7 @@ def delete(id):
 def edit(id):
     item = get_id(id)
     conn = get_db_connection()
-    faciityDBCategory = conn.execute('SELECT * FROM faciityDBCategories').fetchall()
+    facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
     conn.close()
     if request.method == 'POST':
         item = request.form['item']
@@ -178,11 +178,11 @@ def edit(id):
         have = request.form['have']
         goal = request.form['goal']
         conn = get_db_connection()
-        conn.execute('UPDATE faciityDBInventory SET item = ?, category = ?, have = ?, goal = ? WHERE id = ?',(item, category, have, goal, id))
+        conn.execute('UPDATE facilityDBInventory SET item = ?, category = ?, have = ?, goal = ? WHERE id = ?',(item, category, have, goal, id))
         conn.commit()
         conn.close()
         return redirect(url_for('admin'))
-    return render_template('edit.html', item=item, faciityDBCategory=faciityDBCategory)
+    return render_template('edit.html', item=item, facilityDBCategory=facilityDBCategory)
 
 @app.route('/login')
 def login():
@@ -195,11 +195,11 @@ def authenticate():
         pWord = request.form['password']
         pWord = pWord.encode('utf-8')
 
-        #conn = sqlite3.connect('faciityDB.db')
+        #conn = sqlite3.connect('facilityDB.db')
         conn = get_db_connection()
-        #cur.execute('SELECT * FROM faciityDBUsers WHERE userName = ?',(uName,))
-        faciityDBUsers = conn.execute('SELECT * FROM faciityDBUsers WHERE userName = ?',(uName,))
-        userDBRows = faciityDBUsers.fetchone()
+        #cur.execute('SELECT * FROM facilityDBUsers WHERE userName = ?',(uName,))
+        facilityDBUsers = conn.execute('SELECT * FROM facilityDBUsers WHERE userName = ?',(uName,))
+        userDBRows = facilityDBUsers.fetchone()
         #conn = get_db_connection()
         conn.close()
 
@@ -245,7 +245,7 @@ def register():
 
 
         conn = get_db_connection()
-        account = conn.execute('SELECT * FROM faciityDBUsers WHERE username = ?', (userName,)).fetchone()
+        account = conn.execute('SELECT * FROM facilityDBUsers WHERE username = ?', (userName,)).fetchone()
         if account:
             msg = 'User name not available. Please chose another.'
         elif not re.match(r'[^@]+@[^@]+\.[^@]+', eMail):
@@ -255,7 +255,7 @@ def register():
         elif not userName or not passWord or not eMail:
             msg = 'Please fill out the form!'
         else:
-            conn.execute('INSERT INTO faciityDBUsers VALUES (NULL, ?, ?, ?, ?, ?)', (firstName, lastName, eMail, userName, passWord))
+            conn.execute('INSERT INTO facilityDBUsers VALUES (NULL, ?, ?, ?, ?, ?)', (firstName, lastName, eMail, userName, passWord))
             conn.commit()
             conn.close()
             msg = 'You have successfully registered!'
@@ -264,15 +264,15 @@ def register():
 @app.route('/check_users')
 def check_users():
     conn = get_db_connection()
-    faciityDBUsers = conn.execute('SELECT * FROM faciityDBUsers').fetchall()
+    facilityDBUsers = conn.execute('SELECT * FROM facilityDBUsers').fetchall()
     conn.close()
-    return render_template('check_users.html', faciityDBUsers=faciityDBUsers)
+    return render_template('check_users.html', facilityDBUsers=facilityDBUsers)
 
 @app.route("/pdf_list") #don't want this to be homepage
 def pdf_list():
     # Run the inventory query
     conn = get_db_connection()
-    faciityDBInventory = conn.execute('SELECT category, item, goal, have FROM faciityDBInventory').fetchall()
+    facilityDBInventory = conn.execute('SELECT category, item, goal, have FROM facilityDBInventory').fetchall()
     conn.close()
 
 #start with header row for FPDF2 table maker
@@ -280,7 +280,7 @@ def pdf_list():
 
 # calculate needed
     calculatedList = []
-    for row in faciityDBInventory:
+    for row in facilityDBInventory:
         newRow = [row[0], row[1], row[2] - row[3]]
         calculatedList.append(newRow)
 
@@ -326,7 +326,7 @@ def pdf_list():
 def pdf_inventory():
     # Run the inventory query
     conn = get_db_connection()
-    faciityDBInventory = conn.execute('SELECT category, item, goal, have FROM faciityDBInventory').fetchall()
+    facilityDBInventory = conn.execute('SELECT category, item, goal, have FROM facilityDBInventory').fetchall()
     conn.close()
 
 #start with header row for FPDF2 table maker
@@ -334,7 +334,7 @@ def pdf_inventory():
 
 # calculate needed
     calculatedList = []
-    for row in faciityDBInventory:
+    for row in facilityDBInventory:
         newRow = [row[0], row[1], row[2], row[2] - row[3]]
         calculatedList.append(newRow)
 

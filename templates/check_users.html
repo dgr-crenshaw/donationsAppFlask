@@ -2,7 +2,7 @@
 
 {% block content %}
     <h1>{% block title %} 66 West Users {% endblock %}</h1>
-{% for userEntry in faciityDBUsers %}
+{% for userEntry in facilityDBUsers %}
     <p>{{ userEntry['firstName']}}&nbsp;{{ userEntry['lastName']}}&nbsp;{{ userEntry['eMail']}}&nbsp;{{ userEntry['userName']}}&nbsp;{{ userEntry['passWord']}}</p>
 {% endfor %}
 {% endblock %}

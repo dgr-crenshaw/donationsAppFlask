@@ -9,7 +9,7 @@
     <p>Please <a href="{{ url_for('login')}}">login</a></p>
 
 {% else %}
-{% for categoryEntry in faciityDBCategory %}
+{% for categoryEntry in facilityDBCategory %}
     <p>{{ categoryEntry['id'] }} &nbsp; {{ categoryEntry['category'] }}</p>
 {% endfor %}
 {% endif %}

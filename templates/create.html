@@ -17,7 +17,7 @@
     <div class="form-group">
         <label for="category">Category:</label>
         <select name="category" id="category">
-            {% for categoryEntry in faciityDBCategory %}
+            {% for categoryEntry in facilityDBCategory %}
                 <option value="{{ request.form['category'] }}">{{ categoryEntry['category'] }}</option>
             {% endfor %}
         </select>

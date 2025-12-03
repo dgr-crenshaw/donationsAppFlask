@@ -1,8 +1,8 @@
 import sqlite3
 
-conn = sqlite3.connect('faciityDB.db')
+conn = sqlite3.connect('/home/dgrCrenshaw/donationsAppFlask/facilityDB.db')
 cur = conn.cursor()
-cur.execute('SELECT * FROM faciityDBInventory')
+cur.execute('SELECT * FROM facilityDBInventory')
 rows = cur.fetchall()
 conn.close()
 for row in rows:

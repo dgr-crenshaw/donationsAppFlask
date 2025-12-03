@@ -4,7 +4,7 @@
     <h1>{% block title %} 66 West Donations {% endblock %}</h1>
     <p>Download and print a <a href="{{ url_for('pdf_list')}}" target="_blank">shopping list</a></p>
 
-    {% for categoryEntry in faciityDBCategory %}
+    {% for categoryEntry in facilityDBCategory %}
         <h3>{{ categoryEntry['category'] }}</h3>
     <table class="table table-striped">
         <thead>
@@ -15,7 +15,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for itemEntry in faciityDBInventory %}
+            {% for itemEntry in facilityDBInventory %}
                 <tr>
                     {% if itemEntry['category'] == categoryEntry['category'] : %}
 

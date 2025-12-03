@@ -14,7 +14,7 @@
        <p></p>
               <label for="category">Category:</label>
               <select name="category" id="category">
-              {% for categoryEntry in faciityDBCategory %}
+              {% for categoryEntry in facilityDBCategory %}
                      {% if categoryEntry['category'] == item['category']: %}
                             <option value="{{ categoryEntry['category'] }}" selected>{{ categoryEntry['category'] }}</option>
                      {% else %}

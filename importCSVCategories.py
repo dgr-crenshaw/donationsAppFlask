@@ -3,14 +3,14 @@ import sqlite3  # For SQLite database operations
 import csv      # For handling CSV files
 
 # Establish a connection to the SQLite database (creates the database if it doesn't exist)
-conn = sqlite3.connect('faciityDB.db')
+conn = sqlite3.connect('/home/dgrCrenshaw/donationsAppFlask/facilityDB.db')
 
 # Create a cursor object to execute SQL commands
 cursor = conn.cursor()
 
 # Create a table (if it doesn't already exist)
 cursor.execute('''
-CREATE TABLE IF NOT EXISTS faciityDBCategories (
+CREATE TABLE IF NOT EXISTS facilityDBCategories (
     id INTEGER PRIMARY KEY,
     category TEXT
 )
@@ -27,7 +27,7 @@ with open('csvInventoryCategories.csv', 'r') as file:
     # Insert each row into the table
     for row in csv_reader:
         cursor.execute('''
-        INSERT INTO faciityDBCategories (id, category) VALUES (?, ?)
+        INSERT INTO facilityDBCategories (id, category) VALUES (?, ?)
         ''', row)
 
 # Commit changes and close the connection
