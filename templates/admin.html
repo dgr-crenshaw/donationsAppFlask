@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1>{% block title %} 66 West Donations Inventory Management {% endblock %}</h1>
+
+    {% if not session['logged_in'] %}
+
+        <p>You must be logged in to access this function.<br>
+        <p>Please <a href="{{ url_for('login')}}">login</a></p>
+
+    {% else %}
+
+        <p>Download and print a <a href="{{ url_for('pdf_inventory')}}" target="_blank">shopping list</a></p>
+
+    {% for categoryEntry in faciityDBCategory %}
+        <h3>{{ categoryEntry['category'] }}</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Item ID</th>
+                <th>Item</th>
+                <th>Have</th>
+                <th>Goal</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for itemEntry in faciityDBInventory %}
+                <tr>
+                    {% if itemEntry['category'] == categoryEntry['category'] : %}
+
+                        <td>{{ itemEntry['id']}}</td>
+                        <td>{{ itemEntry['item']}}</td>
+                        <td>{{ itemEntry['have']}}</td>
+                        <td>{{ itemEntry['goal']}}</td>
+                        <td><a href="{{ url_for('edit', id=itemEntry['id']) }}">Edit</a></td>
+                </tr>
+                    {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endfor %}
+
+    {% endif %}
+{% endblock %}

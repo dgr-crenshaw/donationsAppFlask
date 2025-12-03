@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1>{% block title %} Authentication Report {% endblock %}</h1>
+
+    <h2>Database query results:</h2>
+        {% for userEntry in userTest %}
+            <p>{{ userEntry['firstName']}}<br>{{ userEntry['lastName']}}<br>{{ userEntry['eMail']}}<br>{{ userEntry['userName']}}<br>{{ userEntry['passWord']}}</p>
+        {% endfor %}
+    <hr>
+    <h2>Password Check and Test Values</h2>
+    <p>pWordCheck:&nbsp;{{ pWordCheck }}</p>
+    <p>pWordTest:&nbsp;{{ pWordTest }}</p>
+    <hr>
+    <h2>Values returned from registration page</h2>
+        <p>User Name:&nbsp;{{ uName }}</p>
+        <p>Password:&nbsp;{{ pWord }}</p>
+    
+{% endblock %}

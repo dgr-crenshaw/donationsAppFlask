@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Register to access inventory management functions</h1>
+
+    {% if session['logged_in'] %}
+
+    <p>You're already registered and logged in.</p>
+
+    {% else %}
+
+    <form action="{{ url_for('register') }}" method="post">
+
+        <div class="form-group">
+            <label for="firstName">First Name</label>
+                    <input type="text" name="firstName" placeholder="First Name"
+                        class="form-control"
+                        required>
+        </div>
+
+        <div class="form-group">
+            <label for="firstName">Last Name</label>
+                    <input type="text" name="lastName" placeholder="Last Name"
+                        class="form-control"
+                        required>
+        </div>
+
+        <div class="form-group">
+        <label for="firstName">Email Address</label>
+                <input type="email" name="eMail" placeholder="Email Address"
+                    class="form-control"
+                    required>
+        </div>
+        
+        <div class="form-group">
+        <label for="firstName">User Name</label>
+                <input type="text" name="userName" placeholder="User Name"
+                    class="form-control"
+                    required>
+        </div>
+
+        <div class="form-group">
+        <label for="Password">Password</label>
+                <input type="password" name="passWord" placeholder="Password"
+                    class="form-control"
+                    required>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+    <div>
+        {{ msg }}
+    </div>
+
+    <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+
+    {% endif %}
+    
+{% endblock %}

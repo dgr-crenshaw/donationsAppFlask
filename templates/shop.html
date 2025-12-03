@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %} 66 West Donations {% endblock %}</h1>
+    <p>Download and print a <a href="{{ url_for('pdf_list')}}" target="_blank">shopping list</a></p>
+
+    {% for categoryEntry in faciityDBCategory %}
+        <h3>{{ categoryEntry['category'] }}</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Goal</th>
+                <th>Have</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for itemEntry in faciityDBInventory %}
+                <tr>
+                    {% if itemEntry['category'] == categoryEntry['category'] : %}
+
+                        <td>{{ itemEntry['item']}}</td>
+                        <td>{{ itemEntry['goal']}}</td>
+                        <td>{{ itemEntry['have']}}</td>
+                </tr>
+                    {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endfor %}
+{% endblock %}

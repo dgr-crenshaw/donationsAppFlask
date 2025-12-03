@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %} 66 West Categories {% endblock %}</h1>
+
+{% if not session['logged_in']: %}
+
+    <p>You must be logged in to access this function.<br>
+    <p>Please <a href="{{ url_for('login')}}">login</a></p>
+
+{% else %}
+{% for categoryEntry in faciityDBCategory %}
+    <p>{{ categoryEntry['id'] }} &nbsp; {{ categoryEntry['category'] }}</p>
+{% endfor %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1>{% block title %} What Do We Get For Output {% endblock %}</h1>
+    <p>{{ toDelete }}</p>
+
+        <p>
+            {% for foo in toDelete %}
+            delete:&nbsp; 
+            {{ foo }}
+            </br>
+        {% endfor %}
+        </p>
+    <p>Done</p>
+
+{% endblock %}

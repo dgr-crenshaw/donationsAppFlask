@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{% block title %} Edit "{{ item['item'] }}" {% endblock %}</h1>
+
+<form method="post">
+       <div class="form-group">
+              <label for="item">Item</label>
+                     <input type="text" name="item" placeholder="item"
+                            class="form-control"
+                            value="{{ request.form['item'] or item['item'] }}">
+
+       <div class="form-group">
+       <p></p>
+              <label for="category">Category:</label>
+              <select name="category" id="category">
+              {% for categoryEntry in faciityDBCategory %}
+                     {% if categoryEntry['category'] == item['category']: %}
+                            <option value="{{ categoryEntry['category'] }}" selected>{{ categoryEntry['category'] }}</option>
+                     {% else %}
+                            <option value="{{ categoryEntry['category'] }}">{{ categoryEntry['category'] }}</option>
+                     {% endif %}
+              {% endfor %}
+              </select>
+       </div>
+
+       <div class="form-group">
+              <label for="have">Have</label>
+              <input type="text" name="have" placeholder="have"
+                     class="form-control"
+                     value="{{ request.form['have'] or item['have'] }}">
+       </div>
+
+          <div class="form-group">
+              <label for="goal">Goal</label>
+              <input type="text" name="need" placeholder="need"
+                     class="form-control"
+                     value="{{ request.form['goal'] or item['goal'] }}">
+       </div>
+
+       <div class="form-group">
+              <button type="submit" class="btn btn-primary">Submit</button>
+       </div>
+</form>
+<hr>
+<form action="{{ url_for('delete',id=item['id']) }}" method="POST">
+    <input type="submit" value="Delete Item"
+            class="btn btn-danger btn-sm"
+            onclick="return confirm('Are you sure you want to delete this post?')">
+</form>
+<hr>
+{% endblock %}

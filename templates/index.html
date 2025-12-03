@@ -1,0 +1,16 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %} 66 West Donations {% endblock %}</h1>
+<p>This is the home page. A bunch of content will go here.</p>
+<p>You're here because you've been invited to test this application. Feel free to do anything you like as you navigate these pages. You won't be able to do much until you register as a user. Once you do, lots of options will appear for editing the inventory.</p>
+<p>Explore all the options you care to. If anything falls over as a result of your actions, it's my fault not yours. <a href="mailto:dgrc@crowswood.com?subject=It's broken">Just let me know with an email</a> and I'll work on fixing it right away.</p>
+<p>Also, if you see anything your don't like, or don't see something you think should be here, make notes and <a href="mailto:dgrc@crowswood.com?subject=I don't like it. Make it better.">email me</a> or talk to me the next time you see me.</p>
+{% if session['logged_in'] == True: %}
+<p>Use the top menu to navigate from page to page.</p>
+{% else %}
+<p>If you are a registered user, please <a href="{{ url_for('login')}}">login</a></p>
+<p>If you are NOT a registered user, please <a href="{{ url_for('register')}}">register</a></p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %} 66 West Inventory {% endblock %}</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Category</th>
+                <th>Item</th>
+                <th>Have</th>
+                <th>Need</th>
+            </tr>
+        </thead>
+{% for inventoryEntry in faciityDBInventory %}
+
+        <tbody>
+
+                        <td>{{ inventoryEntry['id']}}</td>
+                        <td>{{ inventoryEntry['category']}}</td>
+                        <td>{{ inventoryEntry['item']}}</td>
+                        <td>{{ inventoryEntry['need']}}</td>
+                        <td>{{ inventoryEntry['have']}}</td>
+                </tr>
+    {% endfor %}
+{% endblock %}
