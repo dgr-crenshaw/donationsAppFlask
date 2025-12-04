@@ -1,2 +1,2 @@
-id,firstName,lastName,eMail,userName,passWord
-1,Don,Rideaux-Crenshaw,dgrc@crowswood.com,foo,$2b$12$9VvqZ5M/IROWQeY4VOhwwOlLzbV1ZbwjfQodRi8eI4dzdISVgyNP.
+id,firstName,lastName,eMail,userName,passWord,resetStatus
+1,Don,Rideaux-Crenshaw,dgrc@crowswood.com,foo,$2b$12$9VvqZ5M/IROWQeY4VOhwwOlLzbV1ZbwjfQodRi8eI4dzdISVgyNP,0,none
