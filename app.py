@@ -10,6 +10,8 @@ from fpdf.enums import TableCellFillMode
 
 from datetime import datetime
 
+from flask_mail import Mail, Message
+
 now = datetime.now() # current date NOT TIME since time must be serber local
 #dateTime = now.strftime("%m/%d/%Y, %I:%M %p")
 dateTime = now.strftime("%m/%d/%Y")
@@ -51,6 +53,17 @@ class PDF(FPDF):
 
 ### main app -- decorators for routes
 app = Flask(__name__)
+
+mailUser = Mail(app)
+
+#configure email service using a gmail account
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'inventory.response@gmail.com'
+app.config['MAIL_PASSWORD'] = 'kmhb wfuf gfhb gqbr'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+
 app.config['SECRET_KEY'] = '917190101'
 
 @app.route('/')
@@ -195,7 +208,6 @@ def authenticate():
         pWord = request.form['password']
         pWord = pWord.encode('utf-8')
 
-        #conn = sqlite3.connect('facilityDB.db')
         conn = get_db_connection()
         #cur.execute('SELECT * FROM facilityDBUsers WHERE userName = ?',(uName,))
         facilityDBUsers = conn.execute('SELECT * FROM facilityDBUsers WHERE userName = ?',(uName,))
@@ -267,6 +279,44 @@ def check_users():
     facilityDBUsers = conn.execute('SELECT * FROM facilityDBUsers').fetchall()
     conn.close()
     return render_template('check_users.html', facilityDBUsers=facilityDBUsers)
+
+##### starting password reset functionality
+
+##### user requests reset
+@app.route('/reset_request')
+def reset_request():
+    return "foo"
+##### response to request
+@app.route('/reset_response', methods=('GET', 'POST'))
+def reset_response():
+    msg = ''
+    if request.method == 'POST':
+        eMail = request.form['eMail']
+        # search db for username
+        conn = get_db_connection()
+        emailExists = conn.execute('SELECT eMail FROM facilityDBUsers WHERE eMail = ?', (eMail,)).fetchone()
+        conn.close()
+        if emailExists == eMail:
+            msg = 'We found your email address in our records. We will send an email to that address with password recovery instructions'
+            randomLettersDigits = string.ascii_letters + string.digits
+            resetCode = ''.join(random.choice(randomLettersDigits) for index in range(7))
+        	#update database
+            resetStatus = 1
+            conn = get_db_connection()
+            conn.execute('UPDATE facilityDBUsers SET resetStatus = ?, resetCode = ? WHERE eMail = ?',(resetStatus, resetCode, eMail))
+            conn.commit()
+            conn.close()
+        	
+        	#compose email
+            content = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [eMail])
+   			#content.body = "You requested a password reset."
+            argumentsToRender = [eMail, resetCode]
+            content.html = render_template('passwordReset.html', argumentsToRender = argumentsToRender)
+            mailUser.send(content)
+        else:
+            msg = 'This email address is not in our records. You may either try again or contact your admin for assistance'
+            return render_template('reset_response.html', msg=msg)
+##### interim end password reset functionality
 
 @app.route("/pdf_list") #don't want this to be homepage
 def pdf_list():
