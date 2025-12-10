@@ -3,7 +3,7 @@ import sqlite3  # For SQLite database operations
 import csv      # For handling CSV files
 
 # Establish a connection to the SQLite database (creates the database if it doesn't exist)
-conn = sqlite3.connect('/home/dgrCrenshaw/donationsAppFlask/facilityDB.db')
+conn = sqlite3.connect('facilityDB.db')
 
 # Create a cursor object to execute SQL commands
 cursor = conn.cursor()

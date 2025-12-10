@@ -17,7 +17,7 @@ dateTime = now.strftime("%m/%d/%Y")
 titleHeader = "66 West"
 
 def get_db_connection():
-    conn = sqlite3.connect('/home/dgrCrenshaw/donationsAppFlask/facilityDB.db')
+    conn = sqlite3.connect('facilityDB.db')
     conn.row_factory = sqlite3.Row
     return conn
 
