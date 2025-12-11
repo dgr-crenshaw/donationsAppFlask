@@ -10,9 +10,9 @@
     {% else %}
 
     <p>We will be glad to help you reset your password. Please enter your email in the space below and click Submit.</p>
-    <p>If you have an email address registered with us, you will receive an email with further instructions</p>
+    <p>If you have an email address registered with us, you will receive an email with further instructions.</p>
 
-    <form action="{{ url_for('register') }}" method="post">
+    <form action="{{ url_for('reset_response') }}" method="post">
 
         <div class="form-group">
         <label for="firstName">Email Address</label>

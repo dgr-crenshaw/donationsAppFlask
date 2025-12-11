@@ -228,7 +228,7 @@ def authenticate():
              return render_template('login.html')
 
         session['logged_in'] = True
-        flash('You are logged in. Use the extended menu to see your options.')
+        flash('You are logged in. Use the extended menu to see your options.','info')
         return render_template('index.html')
 
 @app.route('/logout')
@@ -283,9 +283,12 @@ def check_users():
 ##### starting password reset functionality
 
 ##### user requests reset
-@app.route('/reset_request')
+@app.route('/reset_request', methods=('GET', 'POST'))
 def reset_request():
-    return "foo"
+    if request.method == 'POST':
+        return "foo"
+    else:
+        return render_template('reset_request.html')
 ##### response to request
 @app.route('/reset_response', methods=('GET', 'POST'))
 def reset_response():
