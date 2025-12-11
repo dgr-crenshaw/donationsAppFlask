@@ -283,42 +283,44 @@ def check_users():
 ##### starting password reset functionality
 
 ##### user requests reset
-@app.route('/reset_request', methods=('GET', 'POST'))
+@app.route('/reset_request')
 def reset_request():
-    if request.method == 'POST':
-        return "foo"
-    else:
-        return render_template('reset_request.html')
+    return render_template('reset_request.html')
 ##### response to request
 @app.route('/reset_response', methods=('GET', 'POST'))
 def reset_response():
-    msg = ''
+    # msg = ''
     if request.method == 'POST':
         eMail = request.form['eMail']
+
         # search db for username
         conn = get_db_connection()
-        emailExists = conn.execute('SELECT eMail FROM facilityDBUsers WHERE eMail = ?', (eMail,)).fetchone()
+
+        emailExists = conn.execute('SELECT eMail FROM facilityDBUsers WHERE eMail = ?',(eMail,)).fetchone()
         conn.close()
-        if emailExists == eMail:
-            msg = 'We found your email address in our records. We will send an email to that address with password recovery instructions'
-            randomLettersDigits = string.ascii_letters + string.digits
-            resetCode = ''.join(random.choice(randomLettersDigits) for index in range(7))
-        	#update database
-            resetStatus = 1
-            conn = get_db_connection()
-            conn.execute('UPDATE facilityDBUsers SET resetStatus = ?, resetCode = ? WHERE eMail = ?',(resetStatus, resetCode, eMail))
-            conn.commit()
-            conn.close()
+    if emailExists[0] == eMail:
+        return eMail
+    else:
+        return "Fail"
+    #         msg = 'We found your email address in our records. We will send an email to that address with password recovery instructions'
+    #         randomLettersDigits = string.ascii_letters + string.digits
+    #         resetCode = ''.join(random.choice(randomLettersDigits) for index in range(7))
+    #     	#update database
+    #         resetStatus = 1
+    #         conn = get_db_connection()
+    #         conn.execute('UPDATE facilityDBUsers SET resetStatus = ?, resetCode = ? WHERE eMail = ?',(resetStatus, resetCode, eMail))
+    #         conn.commit()
+    #         conn.close()
         	
-        	#compose email
-            content = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [eMail])
-   			#content.body = "You requested a password reset."
-            argumentsToRender = [eMail, resetCode]
-            content.html = render_template('passwordReset.html', argumentsToRender = argumentsToRender)
-            mailUser.send(content)
-        else:
-            msg = 'This email address is not in our records. You may either try again or contact your admin for assistance'
-            return render_template('reset_response.html', msg=msg)
+    #     	#compose email
+    #         content = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [eMail])
+   	# 		#content.body = "You requested a password reset."
+    #         argumentsToRender = [eMail, resetCode]
+    #         content.html = render_template('passwordReset.html', argumentsToRender = argumentsToRender)
+    #         mailUser.send(content)
+    #     else:
+    #         msg = 'This email address is not in our records. You may either try again or contact your admin for assistance'
+    #         return render_template('reset_response.html', msg=msg)
 ##### interim end password reset functionality
 
 @app.route("/pdf_list") #don't want this to be homepage
