@@ -289,7 +289,19 @@ def check_users():
 @app.route('/reset_request')
 def reset_request():
     return render_template('reset_request.html')
+
 ##### response to request
+
+########## testing email ##########
+@app.route('/foo')
+def foo():
+   msg = Message('Hello', sender = 'inventory.response@gmail.com', recipients = ['dgcrow@gmail.com'])
+   msg.body = "Hello Flask message sent from Flask-Mail"
+   ##mail.send(msg)
+   return "Sent"
+########## testing email ##########
+
+
 @app.route('/reset_response', methods=('GET', 'POST'))
 def reset_response():
     msg = ''
@@ -314,17 +326,22 @@ def reset_response():
             conn.close()
         	
          	#compose email
-            content = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [eMail])
-            content.body = "You requested a password reset."
+            
+            msg = Message('Hello', sender = 'inventory.response@gmail.com', recipients = [[eMail]])
+            msg.body = "Hello Flask message sent from Flask-Mail"
+            mailUser.send(msg)
+            return msg.body
+            #content = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [eMail])
+            #content.body = "You requested a password reset."
             #argumentsToRender = [eMail, resetCode]
             #content.html = render_template('passwordReset.html', argumentsToRender = argumentsToRender)
-            mailUser.send(content)
+            #mailUser.send(content)
+            #return "success"
+            #return render_template('reset_response.html')
         else:
-            return "fail"
-
-    #     else:
-    #         msg = 'This email address is not in our records. You may either try again or contact your admin for assistance'
-    #         return render_template('reset_response.html', msg=msg)
+            #return "fail"
+            msg = 'This email address is not in our records. You may either try again or contact your admin for assistance'
+            return render_template('reset_request.html', msg=msg)
 ##### interim end password reset functionality
 
 @app.route("/pdf_list") #don't want this to be homepage
