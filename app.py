@@ -57,8 +57,6 @@ class PDF(FPDF):
 ### main app -- decorators for routes
 app = Flask(__name__)
 
-mailUser = Mail(app)
-
 #configure email service using a gmail account
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
@@ -66,6 +64,8 @@ app.config['MAIL_USERNAME'] = 'inventory.response@gmail.com'
 app.config['MAIL_PASSWORD'] = 'kmhb wfuf gfhb gqbr'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
+
+mail = Mail(app)
 
 app.config['SECRET_KEY'] = '917190101'
 
@@ -293,12 +293,13 @@ def reset_request():
 ##### response to request
 
 ########## testing email ##########
-@app.route('/foo')
-def foo():
-   msg = Message('Hello', sender = 'inventory.response@gmail.com', recipients = ['dgcrow@gmail.com'])
-   msg.body = "Hello Flask message sent from Flask-Mail"
-   ##mail.send(msg)
-   return "Sent"
+# @app.route("/foo")
+# def foo():
+#    sendTo = 'dgrc@crowswood.com'
+#    msg = Message('Test from Local', sender = 'inventory.response@gmail.com', recipients = [sendTo])
+#    msg.body = "Test running properly from VSCode"
+#    mail.send(msg)
+#    return "Sent"
 ########## testing email ##########
 
 
@@ -326,18 +327,19 @@ def reset_response():
             conn.close()
         	
          	#compose email
-            
-            msg = Message('Hello', sender = 'inventory.response@gmail.com', recipients = [[eMail]])
+             
+            sendTo = 'dgrc@crowswood.com'
+            msg = Message('Sent from VSCode test 02', sender = 'inventory.response@gmail.com', recipients = [sendTo])
             msg.body = "Hello Flask message sent from Flask-Mail"
-            mailUser.send(msg)
+            mail.send(msg)
             return msg.body
-            #content = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [eMail])
-            #content.body = "You requested a password reset."
-            #argumentsToRender = [eMail, resetCode]
-            #content.html = render_template('passwordReset.html', argumentsToRender = argumentsToRender)
-            #mailUser.send(content)
-            #return "success"
-            #return render_template('reset_response.html')
+            # content = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [eMail])
+            # content.body = "You requested a password reset."
+            # argumentsToRender = [eMail, resetCode]
+            # content.html = render_template('passwordReset.html', argumentsToRender = argumentsToRender)
+            # mail.send(content)
+            # return "success"
+            # return render_template('reset_response.html')
         else:
             #return "fail"
             msg = 'This email address is not in our records. You may either try again or contact your admin for assistance'
