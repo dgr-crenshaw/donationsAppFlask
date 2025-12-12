@@ -328,18 +328,18 @@ def reset_response():
         	
          	#compose email
              
-            sendTo = 'dgrc@crowswood.com'
-            msg = Message('Sent from VSCode test 02', sender = 'inventory.response@gmail.com', recipients = [sendTo])
-            msg.body = "Hello Flask message sent from Flask-Mail"
+            sendTo = str(emailExists[0])
+            msg = Message('Reset Request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
+            msg.body = "Your reset code is "+resetCode+" Use this code at web address to reset"
             mail.send(msg)
-            return msg.body
+            #return sendTo
             # content = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [eMail])
             # content.body = "You requested a password reset."
             # argumentsToRender = [eMail, resetCode]
             # content.html = render_template('passwordReset.html', argumentsToRender = argumentsToRender)
             # mail.send(content)
             # return "success"
-            # return render_template('reset_response.html')
+            return render_template('reset_response.html')
         else:
             #return "fail"
             msg = 'This email address is not in our records. You may either try again or contact your admin for assistance'
