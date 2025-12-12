@@ -329,16 +329,16 @@ def reset_response():
          	#compose email
              
             sendTo = str(emailExists[0])
-            msg = Message('Reset Request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
-            msg.body = "Your reset code is "+resetCode+" Use this code at web address to reset"
-            mail.send(msg)
+            # msg = Message('Reset Request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
+            # msg.body = "Your reset code is "+resetCode+" Use this code at web address to reset"
+            # mail.send(msg)
             #return sendTo
-            # content = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [eMail])
-            # content.body = "You requested a password reset."
-            # argumentsToRender = [eMail, resetCode]
-            # content.html = render_template('passwordReset.html', argumentsToRender = argumentsToRender)
-            # mail.send(content)
-            # return "success"
+            msg = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
+            msg.body = "Your reset code is "+resetCode+" Use this code at web address to reset"
+            #msg.html="<html><body><p>This is a test email sent with the <a href=\\\"https://foo.bar\\\">foo bar</a> SMTP server!</p></body></html>"
+            argumentsToRender = [eMail, resetCode]
+            msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
+            mail.send(msg)
             return render_template('reset_response.html')
         else:
             #return "fail"
