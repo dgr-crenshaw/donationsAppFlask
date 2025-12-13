@@ -15,7 +15,7 @@ from datetime import datetime
 
 from flask_mail import Mail, Message
 
-now = datetime.now() # current date NOT TIME since time must be serber local
+now = datetime.now() # current date NOT TIME since time must be server local
 #dateTime = now.strftime("%m/%d/%Y, %I:%M %p")
 dateTime = now.strftime("%m/%d/%Y")
 
@@ -224,10 +224,10 @@ def authenticate():
             pWordTest = bcrypt.checkpw(pWord,pWordCheck)
 
         elif userDBRows is None:
-             flash('Login failed. This user name does not exits')
+             flash('Login failed. This user name does not exist.','warning')
              return render_template('login.html')
         elif pWordTest == False:
-             flash('login failed. This password is incorrect')
+             flash('login failed. This password is incorrect','warning')
              return render_template('login.html')
 
         session['logged_in'] = True
@@ -292,17 +292,6 @@ def reset_request():
 
 ##### response to request
 
-########## testing email ##########
-# @app.route("/foo")
-# def foo():
-#    sendTo = 'dgrc@crowswood.com'
-#    msg = Message('Test from Local', sender = 'inventory.response@gmail.com', recipients = [sendTo])
-#    msg.body = "Test running properly from VSCode"
-#    mail.send(msg)
-#    return "Sent"
-########## testing email ##########
-
-
 @app.route('/reset_response', methods=('GET', 'POST'))
 def reset_response():
     msg = ''
@@ -316,7 +305,7 @@ def reset_response():
         conn.close()
         if emailExists is not None:
             #return "succeed"
-            msg = 'We found your email address in our records. We will send an email to that address with password recovery instructions'
+            msg = 'We found your email address in our records. We will send an email to that address with password recovery instructions.'
             randomLettersDigits = string.ascii_letters + string.digits
             resetCode = ''.join(random.choice(randomLettersDigits) for index in range(7))
          	#update database
@@ -329,10 +318,6 @@ def reset_response():
          	#compose email
              
             sendTo = str(emailExists[0])
-            # msg = Message('Reset Request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
-            # msg.body = "Your reset code is "+resetCode+" Use this code at web address to reset"
-            # mail.send(msg)
-            #return sendTo
             msg = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
             argumentsToRender = [eMail, resetCode]
             msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
@@ -340,11 +325,19 @@ def reset_response():
             return render_template('reset_response.html')
         else:
             #return "fail"
-            msg = 'This email address is not in our records. You may either try again or contact your admin for assistance'
+            msg = 'This email address is not in our records. You may either try again or contact your admin for assistance.'
             return render_template('reset_request.html', msg=msg)
-##### interim end password reset functionality
 
-@app.route("/pdf_list") #don't want this to be homepage
+@app.route('/reset_validate', methods=('GET', 'POST'))
+def reset_validate():
+        if request.method == 'POST':
+            resetCode = request.form['resetCode']
+            newPassWord = request.form['newPassWord']
+            return resetCode + " | " + newPassWord
+        else:
+            return 'fail'
+
+@app.route("/pdf_list")
 def pdf_list():
     # Run the inventory query
     conn = get_db_connection()

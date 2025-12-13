@@ -5,13 +5,14 @@
     <h1>Reset Your Password</h1>
 
 
-        <p>Log in here with your user name and password. If you are not a registered user contact the <a href="mailto:inventory.response@gmail.com?subject=I need access to the inventory functions">site admin</a> </p>
-        <form action="{{ url_for('reset_response') }}" method="POST">
+        <p>You should have just received an email with password reset information. Once you have that email, enter the reset code and a new password.</p>
+        <p>If you are not a registered user contact the <a href="mailto:inventory.response@gmail.com?subject=I need access to the inventory functions">site admin</a>.</p>
+        <form action="{{ url_for('reset_validate') }}" method="POST">
 
         <div class="form-group">
-            <input type="test" name="resestcode" placeholder="Your reset code">
+            <input type="test" name="resetCode" placeholder="Your reset code">
             </br></br>
-            <input type="password" name="password" placeholder="Your new password">
+            <input type="password" name="newPassWord" placeholder="Your new password">
         </div>
 
         <div class="form-group">
