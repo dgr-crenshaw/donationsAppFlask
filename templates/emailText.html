@@ -12,8 +12,12 @@
   </head>
   <body>
     <div class="container">
-<p>{{ argumentsToRender[0] }}</p>
-<p>{{ argumentsToRender[1] }}</p>
-    </div>
+        <p>Below are the requested reset code and email address you should use to reset your password</p>
+            <ul>
+                <li>Email address: <em>{{ argumentsToRender[0] }}</em></li>
+                <li> Reset code: <em>{{ argumentsToRender[1] }}</em></li>
+            </ul>
+        <p>Go to <a href='https://dgrcrenshaw.pythonanywhere.com/'>The inventory control website</a></p>
+        </div>
   </body>
 </html>

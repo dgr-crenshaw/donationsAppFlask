@@ -58,10 +58,22 @@
         </div>
     </nav>
     <div class="container">
-          {% block pageTitle %} {% endblock %}
+      {% block pageTitle %} {% endblock %}
+          
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert-{{ category }}"> {{ message }} </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      
+      <!--
       {% for message in get_flashed_messages() %}
-          <div class="alert alert-danger">{{ message }}</div>
+        <div class="alert alert-danger">{{ message }}</div>
       {% endfor %}
+    -->
+
       {% block content %} {% endblock %}
     </div>
 
