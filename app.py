@@ -241,7 +241,6 @@ def logout():
 
 @app.route('/register', methods=('GET', 'POST'))
 def register():
-    msg = ''
     if request.method == 'POST': #and 'firstName' in request.form and 'lastName' in request.form and 'eMail' in request.form and 'userName' in request.form and 'passWord' in request.form:
         firstName = request.form['firstName']
         lastName = request.form['lastName']
@@ -258,23 +257,27 @@ def register():
         # Hashing the password
         passWord = bcrypt.hashpw(passWord, salt)
 
+        #convert it to a string for storage
+        passWord = str(passWord)
+        #chop off first two characters
+        passWord = passWord[2:]
 
         conn = get_db_connection()
         account = conn.execute('SELECT * FROM facilityDBUsers WHERE username = ?', (userName,)).fetchone()
         if account:
-            msg = 'User name not available. Please chose another.'
+            flash('User name not available. Please chose another.','warning')
         elif not re.match(r'[^@]+@[^@]+\.[^@]+', eMail):
-            msg = 'Invalid email address!'
+            flash('Invalid email address!','warning')
         elif not re.match(r'[A-Za-z0-9]+', userName):
-            msg = 'Username must contain only letters and numbers!'
+            flash('Username must contain only letters and numbers!','warning')
         elif not userName or not passWord or not eMail:
-            msg = 'Please fill out the form!'
+            flash('Please fill out the form!','warning')
         else:
-            conn.execute('INSERT INTO facilityDBUsers VALUES (NULL, ?, ?, ?, ?, ?)', (firstName, lastName, eMail, userName, passWord))
+            conn.execute('INSERT INTO facilityDBUsers VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)', (firstName, lastName, eMail, userName, passWord,'0','none'))
             conn.commit()
             conn.close()
-            msg = 'You have successfully registered!'
-    return render_template('register.html', msg=msg)
+            flash('You have successfully registered!','success')
+    return render_template('register.html')
 
 @app.route('/check_users')
 def check_users():
@@ -294,7 +297,6 @@ def reset_request():
 
 @app.route('/reset_response', methods=('GET', 'POST'))
 def reset_response():
-    msg = ''
     if request.method == 'POST':
         eMail = request.form['eMail']
 
@@ -304,8 +306,7 @@ def reset_response():
         emailExists = conn.execute('SELECT eMail FROM facilityDBUsers WHERE eMail = ?',(eMail,)).fetchone()
         conn.close()
         if emailExists is not None:
-            #return "succeed"
-            msg = 'We found your email address in our records. We will send an email to that address with password recovery instructions.'
+            flash('We found your email address in our records. We will send an email to that address with password recovery instructions.','success')
             randomLettersDigits = string.ascii_letters + string.digits
             resetCode = ''.join(random.choice(randomLettersDigits) for index in range(7))
          	#update database
@@ -324,18 +325,37 @@ def reset_response():
             mail.send(msg)
             return render_template('reset_response.html')
         else:
-            #return "fail"
-            msg = 'This email address is not in our records. You may either try again or contact your admin for assistance.'
-            return render_template('reset_request.html', msg=msg)
+            flash('This email address is not in our records. You may either try again or contact your admin for assistance.','warning')
+            return render_template('reset_request.html')
 
 @app.route('/reset_validate', methods=('GET', 'POST'))
 def reset_validate():
         if request.method == 'POST':
             resetCode = request.form['resetCode']
             newPassWord = request.form['newPassWord']
-            return resetCode + " | " + newPassWord
-        else:
-            return 'fail'
+            #hit database for resetCode validity
+            conn = get_db_connection()
+            resetCodeDB = conn.execute('SELECT resetCode FROM facilityDBUsers WHERE resetCode = ?',(resetCode,)).fetchone()
+            conn.close()
+            if resetCodeDB is not None:
+                #hash the password
+                # converting password to array of bytes
+                newPassWord = newPassWord.encode('utf-8')
+                # generating the salt
+                salt = bcrypt.gensalt()
+                # Hashing the password
+                newPassWord = bcrypt.hashpw(newPassWord, salt)
+                #update the resetStatus to 0
+                #update the resetCode to none
+                conn = get_db_connection()
+                conn.execute('UPDATE facilityDBUsers SET passWord = ?, resetStatus = ?, resetCode = ? WHERE resetCode = ?',(newPassWord, '0', 'none', resetCode))
+                conn.commit()
+                conn.close()
+                flash('Your password has been reset. You can now log into the website','success')
+                return render_template('login.html')
+            else:
+                flash('Your reset request failed. Please be sure you are using the right reset code and email address.','danger')
+                return newPassWord #render_template('resest_template.html')
 
 @app.route("/pdf_list")
 def pdf_list():

@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS facilityDBUsers (
     lastName TEXT,
     eMail TEXT,
     userName TEXT,
-    passWord VARCHAR(60),
+    passWord TEXT,
     resetStatus BOOL,
     resetCode TEXT
 )
