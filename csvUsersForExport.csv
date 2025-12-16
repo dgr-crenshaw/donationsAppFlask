@@ -1,2 +1,4 @@
-id,firstName,lastName,eMail,userName,passWord,resetStatus
+
+id,firstName,lastName,eMail,userName,passWord,resetStatus,resetCode
 1,Don,Rideaux-Crenshaw,dgrc@crowswood.com,foo,$2b$12$9VvqZ5M/IROWQeY4VOhwwOlLzbV1ZbwjfQodRi8eI4dzdISVgyNP,0,none
+2,Don,Rideaux-Crenshaw,donrc@duck.com,don,$2b$12$UP8YGIydeW/LVaR4tFdK.OY7gUyKoNOLwidBflJZmmGWQUdeQjXpW, 0,none

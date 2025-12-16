@@ -1,6 +1,7 @@
 import sqlite3
 
 with sqlite3.connect('/home/dgrCrenshaw/donationsAppFlask/facilityDB.db') as conn:
+
     cursor = conn.cursor()
 
     # Query sqlite_master for tables
