@@ -248,19 +248,26 @@ def register():
         userName = request.form['userName']
         passWord = request.form['passWord']
 
+        # test for length
+        foo = len(passWord)
+        if foo < 8:
+            flash('Password must me at least 8 characters!','warning')
+            return render_template('register.html')
+
+
         # converting password to array of bytes
-        passWord = passWord.encode('utf-8')
+        passWordHash = passWord.encode('utf-8')
 
         # generating the salt
         salt = bcrypt.gensalt()
 
         # Hashing the password
-        passWord = bcrypt.hashpw(passWord, salt)
+        passWordHash = bcrypt.hashpw(passWordHash, salt)
 
         #convert it to a string for storage
-        passWord = str(passWord)
+        passWordHash = str(passWordHash)
         #chop off first two characters
-        passWord = passWord[2:]
+        paspassWordHashsWord = passWordHash[2:]
 
         conn = get_db_connection()
         account = conn.execute('SELECT * FROM facilityDBUsers WHERE username = ?', (userName,)).fetchone()
@@ -273,7 +280,7 @@ def register():
         elif not userName or not passWord or not eMail:
             flash('Please fill out the form!','warning')
         else:
-            conn.execute('INSERT INTO facilityDBUsers VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)', (firstName, lastName, eMail, userName, passWord,'0','none'))
+            conn.execute('INSERT INTO facilityDBUsers VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)', (firstName, lastName, eMail, userName, passWordHash,'0','none'))
             conn.commit()
             conn.close()
             flash('You have successfully registered!','success')
@@ -345,6 +352,11 @@ def reset_validate():
                 salt = bcrypt.gensalt()
                 # Hashing the password
                 newPassWord = bcrypt.hashpw(newPassWord, salt)
+                #convert it to a string for storage
+                newPassWord = str(newPassWord)
+                #chop off first two characters
+                newPassWord = newPassWord[2:]
+
                 #update the resetStatus to 0
                 #update the resetCode to none
                 conn = get_db_connection()
