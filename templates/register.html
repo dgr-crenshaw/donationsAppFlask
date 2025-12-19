@@ -11,37 +11,45 @@
 
     <form action="{{ url_for('register') }}" method="post">
 
-        <div class="form-group">
+        <!--div class="form-group">
             <label for="firstName">First Name</label>
                     <input type="text" name="firstName" placeholder="First Name"
                         class="form-control"
                         required>
-        </div>
+        </div-->
 
         <div class="form-group">
-            <label for="firstName">Last Name</label>
-                    <input type="text" name="lastName" placeholder="Last Name"
+            <label for="firstName">First Name</label>
+                    <input type="text" name="firstName" {{ initialContentDictionary['attributeFirstName']}}="{{ initialContentDictionary['attributeValueFirstName'] }}"
                         class="form-control"
                         required>
         </div>
 
         <div class="form-group">
-        <label for="firstName">Email Address</label>
-                <input type="email" name="eMail" placeholder="Email Address"
+            <label for="lastName">Last Name</label>
+                    <input type="text" name="lastName"  {{ initialContentDictionary['attributeLastName']}}="{{ initialContentDictionary['attributeValueLastName'] }}"
+                        class="form-control"
+                        required>
+        </div>
+
+        <div class="form-group">
+        <label for="eMail">Email Address</label>
+                <input type="email" name="eMail" {{ initialContentDictionary['attributeEmailAddress']}}="{{ initialContentDictionary['attributeValueEmailAddress'] }}"
+
                     class="form-control"
                     required>
         </div>
         
         <div class="form-group">
         <label for="firstName">User Name</label>
-                <input type="text" name="userName" placeholder="User Name"
+                <input type="text" name="userName" {{ initialContentDictionary['attributeUserName']}}="{{ initialContentDictionary['attributeValueUserName'] }}"
                     class="form-control"
                     required>
         </div>
 
         <div class="form-group">
         <label for="Password">Password</label>
-                <input type="password" name="passWord" placeholder="Password"
+                <input type="password" name="passWord" {{ initialContentDictionary['attributePassWord']}}="{{ initialContentDictionary['attributeValuePassWord'] }}"
                     class="form-control"
                     required>
         </div>

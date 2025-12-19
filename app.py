@@ -241,6 +241,20 @@ def logout():
 
 @app.route('/register', methods=('GET', 'POST'))
 def register():
+
+    initialContentDictionary = {
+        'attributeFirstName': 'placeholder',
+        'attributeValueFirstName': 'First Name',
+        'attributeLastName': 'placeholder',
+        'attributeValueLastName': 'Last Name',
+        'attributeEmailAddress': 'placeholder',
+        'attributeValueEmailAddress': 'Email Address',
+        'attributeUserName': 'placeholder',
+        'attributeValueUserName': 'User Name',
+        'attributePassWord': 'placeholder',
+        'attributeValuePassWord': 'Password'
+    }
+
     if request.method == 'POST': #and 'firstName' in request.form and 'lastName' in request.form and 'eMail' in request.form and 'userName' in request.form and 'passWord' in request.form:
         firstName = request.form['firstName']
         lastName = request.form['lastName']
@@ -249,10 +263,24 @@ def register():
         passWord = request.form['passWord']
 
         # test for length
-        foo = len(passWord)
-        if foo < 8:
+        testPasswordLength = len(passWord)
+        if testPasswordLength < 8:
             flash('Password must me at least 8 characters!','warning')
-            return render_template('register.html')
+            #update values for entry to return
+            initialContentDictionary = {
+            'attributeFirstName': 'placeholder',
+            'attributeValueFirstName': 'First Name',
+            'attributeLastName': 'placeholder',
+            'attributeValueLastName': 'Last Name',
+            'attributeEmailAddress': 'placeholder',
+            'attributeValueEmailAddress': 'Email Address',
+            'attributeUserName': 'placeholder',
+            'attributeValueUserName': 'User Name',
+            'attributePassWord': 'placeholder',
+            'attributeValuePassWord': 'Password'
+        }
+
+            return render_template('register.html', initialContentDictionary=initialContentDictionary)
 
 
         # converting password to array of bytes
@@ -267,7 +295,7 @@ def register():
         #convert it to a string for storage
         passWordHash = str(passWordHash)
         #chop off first two characters
-        paspassWordHashsWord = passWordHash[2:]
+        passWordHash = passWordHash[2:]
 
         conn = get_db_connection()
         account = conn.execute('SELECT * FROM facilityDBUsers WHERE username = ?', (userName,)).fetchone()
@@ -284,7 +312,9 @@ def register():
             conn.commit()
             conn.close()
             flash('You have successfully registered!','success')
-    return render_template('register.html')
+            return render_template('register.html')
+    else:
+        return render_template('register.html', initialContentDictionary = initialContentDictionary)
 
 @app.route('/check_users')
 def check_users():
