@@ -241,39 +241,22 @@ def logout():
 
 @app.route('/register', methods=('GET', 'POST'))
 def register():
-
-    contentDictionary = {
-        'attribute': 'placeholder',
-        'attributeValueFirstName': 'First Name',
-        'attributeValueLastName': 'Last Name',
-        'attributeValueEmailAddress': 'Email Address',
-        'attributeValueUserName': 'User Name',
-        'attributeValuePassWord': 'Password'
-    }
-
-    if request.method == 'POST': #and 'firstName' in request.form and 'lastName' in request.form and 'eMail' in request.form and 'userName' in request.form and 'passWord' in request.form:
+    if request.method == 'POST':
         firstName = request.form['firstName']
         lastName = request.form['lastName']
         eMail = request.form['eMail']
         userName = request.form['userName']
         passWord = request.form['passWord']
 
-        # test for length
-        testPasswordLength = len(passWord)
-        if testPasswordLength < 8:
-            flash('Password must me at least 8 characters!','warning')
-            #update values for entry to return
-            contentDictionary = {
-            'attribute': 'value',
-            'attributeValueFirstName': firstName,
-            'attributeValueLastName': lastName,
-            'attributeValueEmailAddress': eMail,
-            'attributeValueUserName': userName,
-            'attributeValuePassWord': passWord
+        #update values for entry to return
+        contentDictionary = {
+        'attribute': 'value',
+        'attributeValueFirstName': firstName,
+        'attributeValueLastName': lastName,
+        'attributeValueEmailAddress': eMail,
+        'attributeValueUserName': userName,
+        'attributeValuePassWord': passWord
         }
-
-            return render_template('register.html', contentDictionary=contentDictionary)
-
 
         # converting password to array of bytes
         passWordHash = passWord.encode('utf-8')
@@ -289,23 +272,59 @@ def register():
         #chop off first two characters
         passWordHash = passWordHash[2:]
 
+        #begin entry error tests
+
+        entryErrors = False #initialize
+
+        # test for length
+        testPasswordLength = len(passWord)
+        if testPasswordLength < 8:
+            flash('Password must be at least 8 characters!', 'warning')
+            entryErrors = True
+
         conn = get_db_connection()
         account = conn.execute('SELECT * FROM facilityDBUsers WHERE username = ?', (userName,)).fetchone()
+        
+        #test if user name exists
         if account:
-            flash('User name not available. Please chose another.','warning')
-        elif not re.match(r'[^@]+@[^@]+\.[^@]+', eMail):
-            flash('Invalid email address!','warning')
-        elif not re.match(r'[A-Za-z0-9]+', userName):
-            flash('Username must contain only letters and numbers!','warning')
-        elif not userName or not passWord or not eMail:
-            flash('Please fill out the form!','warning')
+            flash('This user name not available. Please chose another.','warning')
+            entryErrors = True
+
+        #test if email proper form
+        if not re.match(r'[^@]+@[^@]+\.[^@]+', eMail):
+            flash('This is not a valid format for an email address!','warning')
+            entryErrors = True
+
+        #test if user name proper form
+        if not re.match(r'[A-Za-z0-9]+', userName):
+            flash('The username must contain only letters and numbers. Please enter a different user name.','warning')
+            entryErrors = True
+
+        #test if requred field not complete
+        if not userName or not passWord or not eMail:
+            flash('Please fill out the required fields on the form!','warning')
+            entryErrors = True
+
+        if entryErrors == True:
+            return render_template('register.html', contentDictionary=contentDictionary)
+
         else:
             conn.execute('INSERT INTO facilityDBUsers VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)', (firstName, lastName, eMail, userName, passWordHash,'0','none'))
             conn.commit()
             conn.close()
+
             flash('You have successfully registered!','success')
-            return render_template('register.html')
-    else:
+            return render_template('register.html',contentDictionary=contentDictionary)
+
+    elif request.method == 'GET':
+        contentDictionary = {
+        'attribute': 'placeholder',
+        'attributeValueFirstName': 'First Name',
+        'attributeValueLastName': 'Last Name',
+        'attributeValueEmailAddress': 'Email Address',
+        'attributeValueUserName': 'User Name',
+        'attributeValuePassWord': 'Password'
+    }
         return render_template('register.html', contentDictionary = contentDictionary)
 
 @app.route('/check_users')
