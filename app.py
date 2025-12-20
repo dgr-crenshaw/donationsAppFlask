@@ -242,16 +242,12 @@ def logout():
 @app.route('/register', methods=('GET', 'POST'))
 def register():
 
-    initialContentDictionary = {
-        'attributeFirstName': 'placeholder',
+    contentDictionary = {
+        'attribute': 'placeholder',
         'attributeValueFirstName': 'First Name',
-        'attributeLastName': 'placeholder',
         'attributeValueLastName': 'Last Name',
-        'attributeEmailAddress': 'placeholder',
         'attributeValueEmailAddress': 'Email Address',
-        'attributeUserName': 'placeholder',
         'attributeValueUserName': 'User Name',
-        'attributePassWord': 'placeholder',
         'attributeValuePassWord': 'Password'
     }
 
@@ -267,20 +263,16 @@ def register():
         if testPasswordLength < 8:
             flash('Password must me at least 8 characters!','warning')
             #update values for entry to return
-            initialContentDictionary = {
-            'attributeFirstName': 'placeholder',
-            'attributeValueFirstName': 'First Name',
-            'attributeLastName': 'placeholder',
-            'attributeValueLastName': 'Last Name',
-            'attributeEmailAddress': 'placeholder',
-            'attributeValueEmailAddress': 'Email Address',
-            'attributeUserName': 'placeholder',
-            'attributeValueUserName': 'User Name',
-            'attributePassWord': 'placeholder',
-            'attributeValuePassWord': 'Password'
+            contentDictionary = {
+            'attribute': 'value',
+            'attributeValueFirstName': firstName,
+            'attributeValueLastName': lastName,
+            'attributeValueEmailAddress': eMail,
+            'attributeValueUserName': userName,
+            'attributeValuePassWord': passWord
         }
 
-            return render_template('register.html', initialContentDictionary=initialContentDictionary)
+            return render_template('register.html', contentDictionary=contentDictionary)
 
 
         # converting password to array of bytes
@@ -314,7 +306,7 @@ def register():
             flash('You have successfully registered!','success')
             return render_template('register.html')
     else:
-        return render_template('register.html', initialContentDictionary = initialContentDictionary)
+        return render_template('register.html', contentDictionary = contentDictionary)
 
 @app.route('/check_users')
 def check_users():
