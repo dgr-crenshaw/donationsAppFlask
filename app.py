@@ -347,11 +347,12 @@ def reset_request():
 def reset_response():
     if request.method == 'POST':
         eMail = request.form['eMail']
+        userName = request.form['userName']
 
         # search db for username
         conn = get_db_connection()
 
-        emailExists = conn.execute('SELECT eMail FROM facilityDBUsers WHERE eMail = ?',(eMail,)).fetchone()
+        emailExists = conn.execute('SELECT eMail FROM facilityDBUsers WHERE eMail = ? AND userName = ?',(eMail,userName)).fetchone()
         conn.close()
         if emailExists is not None:
             flash('We found your email address in our records. We will send an email to that address with password recovery instructions.','success')
@@ -381,34 +382,40 @@ def reset_validate():
         if request.method == 'POST':
             resetCode = request.form['resetCode']
             newPassWord = request.form['newPassWord']
-            #hit database for resetCode validity
-            conn = get_db_connection()
-            resetCodeDB = conn.execute('SELECT resetCode FROM facilityDBUsers WHERE resetCode = ?',(resetCode,)).fetchone()
-            conn.close()
-            if resetCodeDB is not None:
-                #hash the password
-                # converting password to array of bytes
-                newPassWord = newPassWord.encode('utf-8')
-                # generating the salt
-                salt = bcrypt.gensalt()
-                # Hashing the password
-                newPassWord = bcrypt.hashpw(newPassWord, salt)
-                #convert it to a string for storage
-                newPassWord = str(newPassWord)
-                #chop off first two characters
-                newPassWord = newPassWord[2:]
-
-                #update the resetStatus to 0
-                #update the resetCode to none
-                conn = get_db_connection()
-                conn.execute('UPDATE facilityDBUsers SET passWord = ?, resetStatus = ?, resetCode = ? WHERE resetCode = ?',(newPassWord, '0', 'none', resetCode))
-                conn.commit()
-                conn.close()
-                flash('Your password has been reset. You can now log into the website','success')
-                return render_template('login.html')
+            # test for length
+            testPasswordLength = len(newPassWord)
+            if testPasswordLength < 8:
+                flash('Password must be at least 8 characters!', 'warning')
+                return render_template('reset_response.html')
             else:
-                flash('Your reset request failed. Please be sure you are using the right reset code and email address.','danger')
-                return newPassWord #render_template('resest_template.html')
+                #hit database for resetCode validity
+                conn = get_db_connection()
+                resetCodeDB = conn.execute('SELECT resetCode FROM facilityDBUsers WHERE resetCode = ?',(resetCode,)).fetchone()
+                conn.close()
+                if resetCodeDB is not None:
+                    #hash the password
+                    # converting password to array of bytes
+                    newPassWord = newPassWord.encode('utf-8')
+                    # generating the salt
+                    salt = bcrypt.gensalt()
+                    # Hashing the password
+                    newPassWord = bcrypt.hashpw(newPassWord, salt)
+                    #convert it to a string for storage
+                    newPassWord = str(newPassWord)
+                    #chop off first two characters
+                    newPassWord = newPassWord[2:]
+
+                    #update the resetStatus to 0
+                    #update the resetCode to none
+                    conn = get_db_connection()
+                    conn.execute('UPDATE facilityDBUsers SET passWord = ?, resetStatus = ?, resetCode = ? WHERE resetCode = ?',(newPassWord, '0', 'none', resetCode))
+                    conn.commit()
+                    conn.close()
+                    flash('Your password has been reset. You can now log into the website','success')
+                    return render_template('login.html')
+                else:
+                    flash('Your reset request failed. Please be sure you are using the right reset code.','danger')
+                    return render_template('reset_response.html')
 
 @app.route("/pdf_list")
 def pdf_list():
