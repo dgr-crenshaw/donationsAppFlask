@@ -35,15 +35,38 @@ def get_id(item_id):
     return item
 
 class validatePassword:
+
     def __init__(self, passWord):
         self.passWord = passWord
+
     def testPasswordLength(self):
         testLength = len(self.passWord)
         if testLength < 8:
             return True
         else:
             return False
-
+        
+    def testPasswordUpperCase(self):
+        testUpper = re.match(r'^(?=.*[A-Z]).*$', self.passWord)
+        if not testUpper:
+            return True
+        else:
+            return False
+        
+    def testPasswordNumeric(self):
+        testNumeric = re.match(r'^(?=.*[0-9]).*$', self.passWord)
+        if not testNumeric:
+            return True
+        else:
+            return False
+        
+    def testPasswordSpecial(self):
+        testSpecial = re.match(r'^(?=.*[-+_!@#$%^&*.,?]).*$', self.passWord)
+        if not testSpecial:
+            return True
+        else:
+            return False
+        
 ### new instance to work with headers and footers
 class PDF(FPDF):
     def header(self):
@@ -286,10 +309,26 @@ def register():
 
         entryErrors = False #initialize
 
+        testPasswordTests = validatePassword(passWord)
+        
         # test for length
-        testPasswordLongEnough = validatePassword(passWord)
-        if testPasswordLongEnough.testPasswordLength():
+        if testPasswordTests.testPasswordLength():
             flash('Password must be at least 8 characters!', 'warning')
+            entryErrors = True
+
+        # test for upper case
+        if testPasswordTests.testPasswordUpperCase():
+            flash('Password must have at least one upper case character.','warning')
+            entryErrors = True
+
+        # test for digits
+        if testPasswordTests.testPasswordNumeric():
+            flash('Password must have at least one number.','warning')
+            entryErrors = True
+
+        # test for special chars
+        if testPasswordTests.testPasswordNumeric():
+            flash('Password must have at least one of the following special characters - + _ ! @ # $ % ^ & * . , ?','warning')
             entryErrors = True
 
         conn = get_db_connection()
