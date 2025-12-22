@@ -34,6 +34,16 @@ def get_id(item_id):
         abort(404)
     return item
 
+class validatePassword:
+    def __init__(self, passWord):
+        self.passWord = passWord
+    def testPasswordLength(self):
+        testLength = len(self.passWord)
+        if testLength < 8:
+            return True
+        else:
+            return False
+
 ### new instance to work with headers and footers
 class PDF(FPDF):
     def header(self):
@@ -277,8 +287,8 @@ def register():
         entryErrors = False #initialize
 
         # test for length
-        testPasswordLength = len(passWord)
-        if testPasswordLength < 8:
+        testPasswordLongEnough = validatePassword(passWord)
+        if testPasswordLongEnough.testPasswordLength():
             flash('Password must be at least 8 characters!', 'warning')
             entryErrors = True
 
@@ -333,8 +343,6 @@ def check_users():
     facilityDBUsers = conn.execute('SELECT * FROM facilityDBUsers').fetchall()
     conn.close()
     return render_template('check_users.html', facilityDBUsers=facilityDBUsers)
-
-##### starting password reset functionality
 
 ##### user requests reset
 @app.route('/reset_request')
