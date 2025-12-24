@@ -327,7 +327,7 @@ def register():
             entryErrors = True
 
         # test for special chars
-        if testPasswordTests.testPasswordNumeric():
+        if testPasswordTests.testPasswordSpecial():
             flash('Password must have at least one of the following special characters - + _ ! @ # $ % ^ & * . , ?','warning')
             entryErrors = True
 
@@ -429,11 +429,35 @@ def reset_validate():
         if request.method == 'POST':
             resetCode = request.form['resetCode']
             newPassWord = request.form['newPassWord']
+
+            entryErrors = False #initialize
+
+            testNewPasswordTests = validatePassword(newPassWord)
+        
             # test for length
-            testPasswordLength = len(newPassWord)
-            if testPasswordLength < 8:
+            if testNewPasswordTests.testPasswordLength():
                 flash('Password must be at least 8 characters!', 'warning')
-                return render_template('reset_response.html')
+                entryErrors = True
+            
+            # test for upper case
+            if testNewPasswordTests.testPasswordUpperCase():
+                flash('Password must have at least one upper case character.','warning')
+                entryErrors = True
+
+            # test for digits
+            if testNewPasswordTests.testPasswordNumeric():
+                flash('Password must have at least one number.','warning')
+                entryErrors = True
+
+            # test for special chars
+            if testNewPasswordTests.testPasswordSpecial():
+                flash('Password must have at least one of the following special characters - + _ ! @ # $ % ^ & * . , ?','warning')
+                entryErrors = True
+
+             #return render_template('reset_response.html')
+            if entryErrors == True:
+                return render_template('reset_response.html',)
+            
             else:
                 #hit database for resetCode validity
                 conn = get_db_connection()
