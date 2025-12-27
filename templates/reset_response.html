@@ -5,15 +5,22 @@
     <h1>Reset Your Password</h1>
 
 
-        <p>You should have just received an email with password reset information. Once you have that email, enter the reset code and a new password.</p>
+        <p>You should have just received an email with password reset information. Once you have that email, enter your user name, reset code and a new password.</p>
         <p>If you are not a registered user, please contact the <a href="mailto:inventory.response@gmail.com?subject=I need access to the inventory functions">site admin</a>.</p>
         <form action="{{ url_for('reset_validate') }}" method="POST">
 
         <div class="form-group">
-            <input type="test" name="resetCode" placeholder="Your reset code">
+            <input type="text" name="resetCode" placeholder="Your reset code">
             </br></br>
             <input type="password" name="newPassWord" placeholder="Your new password">
         </div>
+            <p>When you create your password, keep in mind that it must pass all the following tests:</p>
+                <ul>
+                    <li>Be at least 8 characters long.</li>
+                    <li>Have at least one upper case letter.</li>
+                    <li>Have at least on numeral.</li>
+                    <li>Have at least one of the following special characters <em> - + _ ! @ # $ % ^ & * . , ?</em></li>
+                </ul>
 
         <div class="form-group">
             <button type="submit" class="btn btn-primary">Reset</button>

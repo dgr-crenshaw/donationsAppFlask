@@ -34,6 +34,39 @@ def get_id(item_id):
         abort(404)
     return item
 
+class validatePassword:
+
+    def __init__(self, passWord):
+        self.passWord = passWord
+
+    def testPasswordLength(self):
+        testLength = len(self.passWord)
+        if testLength < 8:
+            return True
+        else:
+            return False
+
+    def testPasswordUpperCase(self):
+        testUpper = re.match(r'^(?=.*[A-Z]).*$', self.passWord)
+        if not testUpper:
+            return True
+        else:
+            return False
+
+    def testPasswordNumeric(self):
+        testNumeric = re.match(r'^(?=.*[0-9]).*$', self.passWord)
+        if not testNumeric:
+            return True
+        else:
+            return False
+
+    def testPasswordSpecial(self):
+        testSpecial = re.match(r'^(?=.*[-+_!@#$%^&*.,?]).*$', self.passWord)
+        if not testSpecial:
+            return True
+        else:
+            return False
+
 ### new instance to work with headers and footers
 class PDF(FPDF):
     def header(self):
@@ -241,43 +274,107 @@ def logout():
 
 @app.route('/register', methods=('GET', 'POST'))
 def register():
-    if request.method == 'POST': #and 'firstName' in request.form and 'lastName' in request.form and 'eMail' in request.form and 'userName' in request.form and 'passWord' in request.form:
+    if request.method == 'POST':
         firstName = request.form['firstName']
         lastName = request.form['lastName']
         eMail = request.form['eMail']
         userName = request.form['userName']
         passWord = request.form['passWord']
 
+        #update values for entry to return
+        contentDictionary = {
+        'attribute': 'value',
+        'attributeValueFirstName': firstName,
+        'attributeValueLastName': lastName,
+        'attributeValueEmailAddress': eMail,
+        'attributeValueUserName': userName,
+        'attributeValuePassWord': passWord
+        }
+
         # converting password to array of bytes
-        passWord = passWord.encode('utf-8')
+        passWordHash = passWord.encode('utf-8')
 
         # generating the salt
         salt = bcrypt.gensalt()
 
         # Hashing the password
-        passWord = bcrypt.hashpw(passWord, salt)
+        passWordHash = bcrypt.hashpw(passWordHash, salt)
 
         #convert it to a string for storage
-        passWord = str(passWord)
+        passWordHash = str(passWordHash)
         #chop off first two characters
-        passWord = passWord[2:]
+        passWordHash = passWordHash[2:]
+
+        #begin entry error tests
+
+        entryErrors = False #initialize
+
+        testPasswordTests = validatePassword(passWord)
+
+        # test for length
+        if testPasswordTests.testPasswordLength():
+            flash('Password must be at least 8 characters!', 'warning')
+            entryErrors = True
+
+        # test for upper case
+        if testPasswordTests.testPasswordUpperCase():
+            flash('Password must have at least one upper case character.','warning')
+            entryErrors = True
+
+        # test for digits
+        if testPasswordTests.testPasswordNumeric():
+            flash('Password must have at least one number.','warning')
+            entryErrors = True
+
+        # test for special chars
+        if testPasswordTests.testPasswordSpecial():
+            flash('Password must have at least one of the following special characters - + _ ! @ # $ % ^ & * . , ?','warning')
+            entryErrors = True
 
         conn = get_db_connection()
         account = conn.execute('SELECT * FROM facilityDBUsers WHERE username = ?', (userName,)).fetchone()
+
+        #test if user name exists
         if account:
-            flash('User name not available. Please chose another.','warning')
-        elif not re.match(r'[^@]+@[^@]+\.[^@]+', eMail):
-            flash('Invalid email address!','warning')
-        elif not re.match(r'[A-Za-z0-9]+', userName):
-            flash('Username must contain only letters and numbers!','warning')
-        elif not userName or not passWord or not eMail:
-            flash('Please fill out the form!','warning')
+            flash('This user name not available. Please chose another.','warning')
+            entryErrors = True
+
+        #test if email proper form
+        if not re.match(r'[^@]+@[^@]+\.[^@]+', eMail):
+            flash('This is not a valid format for an email address!','warning')
+            entryErrors = True
+
+        #test if user name proper form
+        if not re.match(r'[A-Za-z0-9]+', userName):
+            flash('The username must contain only letters and numbers. Please enter a different user name.','warning')
+            entryErrors = True
+
+        #test if requred field not complete
+        if not userName or not passWord or not eMail:
+            flash('Please fill out the required fields on the form!','warning')
+            entryErrors = True
+
+        if entryErrors == True:
+            return render_template('register.html', contentDictionary=contentDictionary)
+
         else:
-            conn.execute('INSERT INTO facilityDBUsers VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)', (firstName, lastName, eMail, userName, passWord,'0','none'))
+            conn.execute('INSERT INTO facilityDBUsers VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)', (firstName, lastName, eMail, userName, passWordHash,'0','none'))
             conn.commit()
             conn.close()
+
             flash('You have successfully registered!','success')
-    return render_template('register.html')
+            return render_template('register.html',contentDictionary=contentDictionary)
+
+    elif request.method == 'GET':
+        contentDictionary = {
+        'attribute': 'placeholder',
+        'attributeValueFirstName': 'First Name',
+        'attributeValueLastName': 'Last Name',
+        'attributeValueEmailAddress': 'Email Address',
+        'attributeValueUserName': 'User Name',
+        'attributeValuePassWord': 'Password'
+    }
+        return render_template('register.html', contentDictionary = contentDictionary)
 
 @app.route('/check_users')
 def check_users():
@@ -285,8 +382,6 @@ def check_users():
     facilityDBUsers = conn.execute('SELECT * FROM facilityDBUsers').fetchall()
     conn.close()
     return render_template('check_users.html', facilityDBUsers=facilityDBUsers)
-
-##### starting password reset functionality
 
 ##### user requests reset
 @app.route('/reset_request')
@@ -299,11 +394,12 @@ def reset_request():
 def reset_response():
     if request.method == 'POST':
         eMail = request.form['eMail']
+        userName = request.form['userName']
 
         # search db for username
         conn = get_db_connection()
 
-        emailExists = conn.execute('SELECT eMail FROM facilityDBUsers WHERE eMail = ?',(eMail,)).fetchone()
+        emailExists = conn.execute('SELECT eMail FROM facilityDBUsers WHERE eMail = ? AND userName = ?',(eMail,userName)).fetchone()
         conn.close()
         if emailExists is not None:
             flash('We found your email address in our records. We will send an email to that address with password recovery instructions.','success')
@@ -333,34 +429,64 @@ def reset_validate():
         if request.method == 'POST':
             resetCode = request.form['resetCode']
             newPassWord = request.form['newPassWord']
-            #hit database for resetCode validity
-            conn = get_db_connection()
-            resetCodeDB = conn.execute('SELECT resetCode FROM facilityDBUsers WHERE resetCode = ?',(resetCode,)).fetchone()
-            conn.close()
-            if resetCodeDB is not None:
-                #hash the password
-                # converting password to array of bytes
-                newPassWord = newPassWord.encode('utf-8')
-                # generating the salt
-                salt = bcrypt.gensalt()
-                # Hashing the password
-                newPassWord = bcrypt.hashpw(newPassWord, salt)
-                #convert it to a string for storage
-                newPassWord = str(newPassWord)
-                #chop off first two characters
-                newPassWord = newPassWord[2:]
 
-                #update the resetStatus to 0
-                #update the resetCode to none
-                conn = get_db_connection()
-                conn.execute('UPDATE facilityDBUsers SET passWord = ?, resetStatus = ?, resetCode = ? WHERE resetCode = ?',(newPassWord, '0', 'none', resetCode))
-                conn.commit()
-                conn.close()
-                flash('Your password has been reset. You can now log into the website','success')
-                return render_template('login.html')
+            entryErrors = False #initialize
+
+            testNewPasswordTests = validatePassword(newPassWord)
+
+            # test for length
+            if testNewPasswordTests.testPasswordLength():
+                flash('Password must be at least 8 characters!', 'warning')
+                entryErrors = True
+
+            # test for upper case
+            if testNewPasswordTests.testPasswordUpperCase():
+                flash('Password must have at least one upper case character.','warning')
+                entryErrors = True
+
+            # test for digits
+            if testNewPasswordTests.testPasswordNumeric():
+                flash('Password must have at least one number.','warning')
+                entryErrors = True
+
+            # test for special chars
+            if testNewPasswordTests.testPasswordSpecial():
+                flash('Password must have at least one of the following special characters - + _ ! @ # $ % ^ & * . , ?','warning')
+                entryErrors = True
+
+             #return render_template('reset_response.html')
+            if entryErrors == True:
+                return render_template('reset_response.html',)
+
             else:
-                flash('Your reset request failed. Please be sure you are using the right reset code and email address.','danger')
-                return newPassWord #render_template('resest_template.html')
+                #hit database for resetCode validity
+                conn = get_db_connection()
+                resetCodeDB = conn.execute('SELECT resetCode FROM facilityDBUsers WHERE resetCode = ?',(resetCode,)).fetchone()
+                conn.close()
+                if resetCodeDB is not None:
+                    #hash the password
+                    # converting password to array of bytes
+                    newPassWord = newPassWord.encode('utf-8')
+                    # generating the salt
+                    salt = bcrypt.gensalt()
+                    # Hashing the password
+                    newPassWord = bcrypt.hashpw(newPassWord, salt)
+                    #convert it to a string for storage
+                    newPassWord = str(newPassWord)
+                    #chop off first two characters
+                    newPassWord = newPassWord[2:]
+
+                    #update the resetStatus to 0
+                    #update the resetCode to none
+                    conn = get_db_connection()
+                    conn.execute('UPDATE facilityDBUsers SET passWord = ?, resetStatus = ?, resetCode = ? WHERE resetCode = ?',(newPassWord, '0', 'none', resetCode))
+                    conn.commit()
+                    conn.close()
+                    flash('Your password has been reset. You can now log into the website','success')
+                    return render_template('login.html')
+                else:
+                    flash('Your reset request failed. Please be sure you are using the right reset code.','danger')
+                    return render_template('reset_response.html')
 
 @app.route("/pdf_list")
 def pdf_list():

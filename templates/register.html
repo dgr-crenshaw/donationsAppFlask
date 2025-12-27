@@ -11,41 +11,55 @@
 
     <form action="{{ url_for('register') }}" method="post">
 
-        <div class="form-group">
+        <!--div class="form-group">
             <label for="firstName">First Name</label>
                     <input type="text" name="firstName" placeholder="First Name"
                         class="form-control"
                         required>
-        </div>
+        </div-->
 
         <div class="form-group">
-            <label for="firstName">Last Name</label>
-                    <input type="text" name="lastName" placeholder="Last Name"
+            <label for="firstName">First Name</label>
+                    <input type="text" name="firstName" {{ contentDictionary['attribute']}}="{{ contentDictionary['attributeValueFirstName'] }}"
                         class="form-control"
                         required>
         </div>
 
         <div class="form-group">
-        <label for="firstName">Email Address</label>
-                <input type="email" name="eMail" placeholder="Email Address"
+            <label for="lastName">Last Name</label>
+                    <input type="text" name="lastName"  {{ contentDictionary['attribute']}}="{{ contentDictionary['attributeValueLastName'] }}"
+                        class="form-control"
+                        required>
+        </div>
+
+        <div class="form-group">
+        <label for="eMail">Email Address</label>
+                <input type="email" name="eMail" {{ contentDictionary['attribute']}}="{{ contentDictionary['attributeValueEmailAddress'] }}"
+
                     class="form-control"
                     required>
         </div>
         
         <div class="form-group">
         <label for="firstName">User Name</label>
-                <input type="text" name="userName" placeholder="User Name"
+                <input type="text" name="userName" {{ contentDictionary['attribute']}}="{{ contentDictionary['attributeValueUserName'] }}"
                     class="form-control"
                     required>
         </div>
 
         <div class="form-group">
         <label for="Password">Password</label>
-                <input type="password" name="passWord" placeholder="Password"
+                <input type="password" name="passWord" {{ contentDictionary['attribute']}}="{{ contentDictionary['attributeValuePassWord'] }}"
                     class="form-control"
                     required>
         </div>
-
+            <p>When you create your password, keep in mind that it must pass all the following tests:</p>
+                <ul>
+                    <li>Be at least 8 characters long.</li>
+                    <li>Have at least one upper case letter.</li>
+                    <li>Have at least on numeral.</li>
+                    <li>Have at least one of the following special characters <em> - + _ ! @ # $ % ^ & * . , ?</em></li>
+                </ul>
         <div class="form-group">
             <button type="submit" class="btn btn-primary">Submit</button>
         </div>

@@ -3,14 +3,15 @@
 
 {% block content %}
     <h1>{% block title %} 66 West Donations {% endblock %}</h1>
-        <p>This is the home page. A bunch of content will go here.</p>
-        <p>You're here because you've been invited to test this application. Feel free to do anything you like as you navigate these pages. You won't be able to do much until you register as a user. Once you do, lots of options will appear for editing the inventory.</p>
-        <p>Explore all the options you care to. If anything falls over as a result of your actions, it's my fault not yours. <a href="mailto:inventory.response@gmail.com?subject=It's broken">Just let me know with an email</a> and I'll work on fixing it right away.</p>
-        <p>Also, if you see anything your don't like, or don't see something you think should be here, make notes and <a href="mailto:inventory.response@gmail.com?subject=It's broken">email me</a> or talk to me the next time you see me.</p>
+        <p>Welcome. The Beacon Ministry at Creekside UCC is providing this service to help track what 66West needs to supply its residents with the applicances and supplies they need to have a comfortable, functional place to live.</p>
+        <p>66 West assures that all residents have a fully stocked apartment upon arrival, that expendibles are re-supplied, and that, when a resident leaves for a new home, they take with them what they need to set up housekeeping.</p>
+        <p>For these reasons, 66 West has an ongoing and varying need for supplies. We here are Creekside UCC are working the 66 West to assure that when we call for donations, we prioritize the most needed items. This service will help you know what 66 West needs. We will work to keep the inventory up to date as donations come in. If you go to the <a href = "{{ url_for('shop') }}">shopping list page</a> you will see the current list of itmes needs, along with the needed amount of each. You can open and download a PDF version of this list to save or print.
+        <p>We hope you will use this list to guide your decisions as you help keep 66 West well supplied.</p>
+        <p>If you help manage these giving efforts for your congregation please <a href="mailto:inventory.response@gmail.com?subject=I'm helping manage 66 West donations for my congregation">Just let us know with an email</a>. That way we we can have a point of contact to help keep the inventory updated and accurate. The better we meet 66 West's immediate needs, the more valuable all our efforts will be.</p>
     {% if session['logged_in'] == True: %}
         <p>Use the top menu to navigate from page to page.</p>
     {% else %}
-        <p>If you are a registered user, please <a href="{{ url_for('login')}}">login</a></p>
-        <p>If you are NOT a registered user, please contact your administrator to register. <a href="mailto:inventory.response@gmail.com?subject=Register me as a user">Sign me up please</a></p>
+        <p>If you are a site administator, please <a href="{{ url_for('login')}}">login</a></p>
+        <p>If you are NOT a site administator but wish to be, please contact your administrator to register. <a href="mailto:inventory.response@gmail.com?subject=Register me as a user">Sign me up please</a></p>
     {% endif %}
 {% endblock %}
