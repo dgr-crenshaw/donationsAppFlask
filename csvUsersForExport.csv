@@ -1,4 +1,3 @@
-
 id,firstName,lastName,eMail,userName,passWord,resetStatus,resetCode
-1,Don,Rideaux-Crenshaw,dgrc@crowswood.com,foo,$2b$12$9VvqZ5M/IROWQeY4VOhwwOlLzbV1ZbwjfQodRi8eI4dzdISVgyNP,0,none
-2,Don,Rideaux-Crenshaw,donrc@duck.com,don,$2b$12$UP8YGIydeW/LVaR4tFdK.OY7gUyKoNOLwidBflJZmmGWQUdeQjXpW, 0,none
+1,Don,Rideaux-Crenshaw,dgrc@crowswood.com,donR-C,$2a$12$QdG4EoGwNO/8eVIYn6lMVOGx40OKey1xEpudrZz.v1pB0kiygLQCW,0,none
+2,Susan,Lampe,sslampe68@gmail.com,SusanL,$2a$12$hpCjYqoeB.COZG8v53D9juyrSWlML1lUs.bnsrfmY5DKMEgoWtdBO, 0,none
