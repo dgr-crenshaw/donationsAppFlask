@@ -501,8 +501,10 @@ def pdf_list():
 # calculate needed
     calculatedList = []
     for rowInventory in facilityDBInventory:
-        #newInventoryRow = [rowInventory[0], rowInventory[1], int(rowInventory[2]) - int(rowInventory[3])]
-        newInventoryRow = [rowInventory[0], rowInventory[1], rowInventory[2] - rowInventory[3]]
+        numberNeeded = rowInventory[2] - rowInventory[3]
+        if numberNeeded < 0:
+            numberNeeded = 0
+        newInventoryRow = [rowInventory[0], rowInventory[1], numberNeeded]
         calculatedList.append(newInventoryRow)
 
 #use list comprehension for converting all elements to strings
@@ -532,60 +534,6 @@ def pdf_list():
         headings_style=headings_style,
         line_height=6,
         text_align=("LEFT", "CENTER", "RIGHT"),
-        width=160,
-    ) as table:
-        for data_row in resultList:
-            row = table.row()
-            for datum in data_row:
-                row.cell(datum)
-
-    response = make_response(bytes(pdf.output()))
-    response.headers["Content-Type"] = "application/pdf"
-    return response
-
-@app.route("/pdf_inventory") #don't want this to be homepage
-def pdf_inventory():
-    # Run the inventory query
-    conn = get_db_connection()
-    facilityDBInventory = conn.execute('SELECT category, item, goal, have FROM facilityDBInventory').fetchall()
-    conn.close()
-
-#start with header row for FPDF2 table maker
-    resultList = [['category','item', 'goal', 'needed']]
-
-# calculate needed
-    calculatedList = []
-    for row in facilityDBInventory:
-        newRow = [row[0], row[1], row[2], row[2] - row[3]]
-        calculatedList.append(newRow)
-
-#use list comprehension for converting all elements to strings
-# then append to result list
-    for row in calculatedList:
-        newRow = [str(x) for x in row]
-        resultList.append(newRow)
-
-    # Instantiation of inherited class
-    pdf = PDF()
-    pdf.set_font("helvetica", size=10)
-
-    # Basic table:
-    pdf.add_page()
-
-    pdf.set_draw_color(0, 0, 0)
-    pdf.set_line_width(0.3)
-    headings_style = FontFace(emphasis="BOLD", color=0, fill_color=(255, 255, 255))
-
-    pdf.cell(0,10, 'Current Inventory', border=False, align="C", ln=True)
-
-    with pdf.table(
-        borders_layout="NO_HORIZONTAL_LINES",
-        cell_fill_color=(211, 211, 211),
-        cell_fill_mode=TableCellFillMode.ROWS,
-        col_widths=(42, 39, 35, 44),
-        headings_style=headings_style,
-        line_height=6,
-        text_align=("LEFT", "CENTER", "RIGHT", "RIGHT"),
         width=160,
     ) as table:
         for data_row in resultList:
