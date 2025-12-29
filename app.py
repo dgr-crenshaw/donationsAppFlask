@@ -500,15 +500,16 @@ def pdf_list():
 
 # calculate needed
     calculatedList = []
-    for row in facilityDBInventory:
-        newRow = [row[0], row[1], row[2] - row[3]]
-        calculatedList.append(newRow)
+    for rowInventory in facilityDBInventory:
+        #newInventoryRow = [rowInventory[0], rowInventory[1], int(rowInventory[2]) - int(rowInventory[3])]
+        newInventoryRow = [rowInventory[0], rowInventory[1], rowInventory[2] - rowInventory[3]]
+        calculatedList.append(newInventoryRow)
 
 #use list comprehension for converting all elements to strings
 # then append to result list
-    for row in calculatedList:
-        newRow = [str(x) for x in row]
-        resultList.append(newRow)
+    for rowEntry in calculatedList:
+        newEntryRow = [str(x) for x in rowEntry]
+        resultList.append(newEntryRow)
 
     # Instantiation of inherited class
     pdf = PDF()
