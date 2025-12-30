@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{% block title %} Edit "{{ user['userName'] }}" {% endblock %}</h1>
+
+    {% if not session['logged_in'] %}
+
+        <p>You must be logged in to access this function.<br>
+        <p>Please <a href="{{ url_for('login')}}">login</a></p>
+
+    {% else %}
+
+<form method="post">
+
+       <div class="form-group">
+              <label for="nameLast">Last Name</label>
+              <input type="text" name="lastName" placeholder="Last Name"
+                     class="form-control"
+                     value="{{ request.form['lastName'] or user['lastName'] }}">
+       </div>
+
+          <div class="form-group">
+              <label for="nameFirst">First Name</label>
+              <input type="text" name="firstName" placeholder="First Name"
+                     class="form-control"
+                     value="{{ request.form['firstName'] or user['firstName'] }}">
+       </div>
+
+       <div class="form-group">
+              <label for="nameLast">Email Address</label>
+              <input type="text" name="eMail" placeholder="Email"
+                     class="form-control"
+                     value="{{ request.form['eMail'] or user['eMail'] }}">
+       </div>
+
+       <div class="form-group">
+              <label for="nameLast">User Name</label>
+              <input type="text" name="userName" placeholder="User Name"
+                     class="form-control"
+                     value="{{ request.form['userName'] or user['userName'] }}">
+       </div>
+
+       <div class="form-group">
+              <button type="submit" class="btn btn-primary">Submit</button>
+       </div>
+
+</form>
+
+<hr>
+<form action="{{ url_for('deleteUser',id=user['id']) }}" method="POST">
+    <input type="submit" value="Delete Item"
+            class="btn btn-danger btn-sm"
+            onclick="return confirm('Are you sure you want to delete this user?')">
+</form>
+<hr>
+    {% endif %}
+{% endblock %}

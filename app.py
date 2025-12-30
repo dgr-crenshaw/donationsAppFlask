@@ -21,18 +21,26 @@ dateTime = now.strftime("%m/%d/%Y")
 
 titleHeader = "66 West"
 
-def get_db_connection():
+def getDBConnection():
     conn = sqlite3.connect('facilityDB.db')
     conn.row_factory = sqlite3.Row
     return conn
 
-def get_id(item_id):
-    conn = get_db_connection()
-    item = conn.execute('SELECT * FROM facilityDBInventory WHERE id = ?',(item_id,)).fetchone()
+def getItemID(itemID):
+    conn = getDBConnection()
+    item = conn.execute('SELECT * FROM facilityDBInventory WHERE id = ?',(itemID,)).fetchone()
     conn.close()
     if item is None:
         abort(404)
     return item
+
+def getUserID(userID):
+    conn = getDBConnection()
+    user = conn.execute('SELECT * FROM facilityDBUSERS WHERE id = ?',(userID,)).fetchone()
+    conn.close()
+    if user is None:
+        abort(404)
+    return user
 
 class validatePassword:
 
@@ -108,7 +116,7 @@ def index():
 
 @app.route('/shop')
 def shop():
-    conn = get_db_connection()
+    conn = getDBConnection()
     facilityDBInventory = conn.execute('SELECT * FROM facilityDBInventory').fetchall()
     facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
     conn.close()
@@ -118,18 +126,18 @@ def shop():
 
 @app.route('/admin')
 def admin():
-    conn = get_db_connection()
+    conn = getDBConnection()
     facilityDBInventory = conn.execute('SELECT * FROM facilityDBInventory').fetchall()
     facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
     conn.close()
     return render_template('admin.html', facilityDBInventory=facilityDBInventory,facilityDBCategory=facilityDBCategory)
 
-@app.route('/user_admin')
-def user_admin():
-    conn = get_db_connection()
+@app.route('/userAdmin')
+def userAdmin():
+    conn = getDBConnection()
     facilityDBUsers = conn.execute('SELECT * FROM facilityDBUsers').fetchall()
     conn.close()
-    return render_template('user_admin.html', facilityDBUsers=facilityDBUsers)
+    return render_template('userAdmin.html', facilityDBUsers=facilityDBUsers)
 
 # Create
 @app.route('/create', methods=('GET', 'POST'))
@@ -139,13 +147,13 @@ def create():
         newItem = request.form['item']
         newHave = request.form['have']
         newNeed = request.form['goal']
-        conn = get_db_connection()
+        conn = getDBConnection()
         conn.execute('INSERT INTO facilityDBInventory (category, item, have, goal) VALUES (?, ?, ?, ?)',(newCategory, newItem, newHave, newNeed))
         conn.commit()
         conn.close()
         return redirect(url_for('admin'))
     else:
-        conn = get_db_connection()
+        conn = getDBConnection()
         facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
         conn.close()
         return render_template('create.html',facilityDBCategory=facilityDBCategory)
@@ -155,21 +163,21 @@ def create():
 def add_category():
     if request.method == 'POST':
         newCategory = request.form['category']
-        conn = get_db_connection()
+        conn = getDBConnection()
         conn.execute('INSERT INTO facilityDBCategories (category) VALUES (?)',(newCategory,))
         conn.commit()
         conn.close()
         return redirect(url_for('create'))
 
     elif request.method == 'GET':
-        conn = get_db_connection()
+        conn = getDBConnection()
         facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
         conn.close()
         return render_template('add_category.html',facilityDBCategory=facilityDBCategory)
 
 @app.route('/categories')
 def categories():
-    conn = get_db_connection()
+    conn = getDBConnection()
     facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
     conn.close()
     return render_template('categories.html', facilityDBCategory=facilityDBCategory)
@@ -180,7 +188,7 @@ def delete_empty_category():
         toDelete = (request.form.getlist('cbox[]'))
         toDelete = [category for category in zip(*[iter(toDelete)])]
 
-        conn = get_db_connection()
+        conn = getDBConnection()
         conn.executemany('DELETE FROM facilityDBCategories WHERE category = ?', (toDelete))
         conn.commit()
 
@@ -195,7 +203,7 @@ def delete_empty_category():
 
         return render_template('delete_empty_category.html', emptyCategoryList=emptyCategoryList)
     else:
-        conn = get_db_connection()
+        conn = getDBConnection()
         checkInventory = conn.execute('SELECT category FROM facilityDBInventory').fetchall()
         checkCategories = conn.execute('SELECT category FROM facilityDBCategories').fetchall()
         conn.close()
@@ -207,25 +215,35 @@ def delete_empty_category():
 
 @app.route('/inventory')
 def inventory():
-    conn = get_db_connection()
+    conn = getDBConnection()
     facilityDBInventory = conn.execute('SELECT * FROM facilityDBInventory').fetchall()
     conn.close()
     return render_template('inventory.html', facilityDBInventory=facilityDBInventory)
 
 @app.route('/<int:id>/delete', methods=('POST',))
 def delete(id):
-    itemID = get_id(id)
-    conn = get_db_connection()
+    itemID = getItemID(id)
+    conn = getDBConnection()
     conn.execute('DELETE FROM facilityDBInventory WHERE id=? ',(id,))
     conn.commit()
     conn.close()
     flash('"{}" successfully deleted!'.format(itemID['item']),'info')
     return redirect(url_for('admin'))
 
+@app.route('/<int:id>/deleteUser', methods=('POST',))
+def deleteUser(id):
+    userID = getUserID(id)
+    conn = getDBConnection()
+    conn.execute('DELETE FROM facilityDBUsers WHERE id=? ',(id,))
+    conn.commit()
+    conn.close()
+    flash('"{}" successfully deleted!'.format(userID['userName']),'info')
+    return redirect(url_for('userAdmin'))
+
 @app.route('/<int:id>/edit', methods=('GET', 'POST'))
 def edit(id):
-    item = get_id(id)
-    conn = get_db_connection()
+    item = getItemID(id)
+    conn = getDBConnection()
     facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
     conn.close()
     if request.method == 'POST':
@@ -233,12 +251,30 @@ def edit(id):
         category = request.form['category']
         have = request.form['have']
         goal = request.form['goal']
-        conn = get_db_connection()
+        conn = getDBConnection()
         conn.execute('UPDATE facilityDBInventory SET item = ?, category = ?, have = ?, goal = ? WHERE id = ?',(item, category, have, goal, id))
         conn.commit()
         conn.close()
         return redirect(url_for('admin'))
     return render_template('edit.html', item=item, facilityDBCategory=facilityDBCategory)
+
+@app.route('/<int:id>/editUser', methods=('GET', 'POST'))
+def editUser(id):
+    user = getUserID(id)
+    #conn = getDBConnection()
+    #facilityDBUser = conn.execute('SELECT * FROM facilityDBUsers').fetchall()
+    #conn.close()
+    if request.method == 'POST':
+        lastName = request.form['lastName']
+        firstName = request.form['firstName']
+        eMail = request.form['eMail']
+        userName = request.form['userName']
+        conn = getDBConnection()
+        conn.execute('UPDATE facilityDBUsers SET lastName = ?, firstName = ?, eMail = ?, userName = ? WHERE id = ?',(lastName, firstName, eMail, userName, id))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('userAdmin'))
+    return render_template('editUser.html', user=user)
 
 @app.route('/login')
 def login():
@@ -251,11 +287,11 @@ def authenticate():
         pWord = request.form['password']
         pWord = pWord.encode('utf-8')
 
-        conn = get_db_connection()
+        conn = getDBConnection()
         #cur.execute('SELECT * FROM facilityDBUsers WHERE userName = ?',(uName,))
         facilityDBUsers = conn.execute('SELECT * FROM facilityDBUsers WHERE userName = ?',(uName,))
         userDBRows = facilityDBUsers.fetchone()
-        #conn = get_db_connection()
+        #conn = getDBConnection()
         conn.close()
 
         if userDBRows is not None:
@@ -338,7 +374,7 @@ def register():
             flash('Password must have at least one of the following special characters - + _ ! @ # $ % ^ & * . , ?','warning')
             entryErrors = True
 
-        conn = get_db_connection()
+        conn = getDBConnection()
         account = conn.execute('SELECT * FROM facilityDBUsers WHERE username = ?', (userName,)).fetchone()
         
         #test if user name exists
@@ -383,28 +419,28 @@ def register():
     }
         return render_template('register.html', contentDictionary = contentDictionary)
 
-@app.route('/check_users')
-def check_users():
-    conn = get_db_connection()
+@app.route('/checkUsers')
+def checkUsers():
+    conn = getDBConnection()
     facilityDBUsers = conn.execute('SELECT * FROM facilityDBUsers').fetchall()
     conn.close()
-    return render_template('check_users.html', facilityDBUsers=facilityDBUsers)
+    return render_template('checkUsers.html', facilityDBUsers=facilityDBUsers)
 
 ##### user requests reset
-@app.route('/reset_request')
-def reset_request():
-    return render_template('reset_request.html')
+@app.route('/resetRequest')
+def resetRequest():
+    return render_template('resetRequest.html')
 
 ##### response to request
 
-@app.route('/reset_response', methods=('GET', 'POST'))
-def reset_response():
+@app.route('/resetResponse', methods=('GET', 'POST'))
+def resetResponse():
     if request.method == 'POST':
         eMail = request.form['eMail']
         userName = request.form['userName']
 
         # search db for username
-        conn = get_db_connection()
+        conn = getDBConnection()
 
         emailExists = conn.execute('SELECT eMail FROM facilityDBUsers WHERE eMail = ? AND userName = ?',(eMail,userName)).fetchone()
         conn.close()
@@ -414,7 +450,7 @@ def reset_response():
             resetCode = ''.join(random.choice(randomLettersDigits) for index in range(7))
          	#update database
             resetStatus = 1
-            conn = get_db_connection()
+            conn = getDBConnection()
             conn.execute('UPDATE facilityDBUsers SET resetStatus = ?, resetCode = ? WHERE eMail = ?',(resetStatus, resetCode, eMail))
             conn.commit()
             conn.close()
@@ -426,13 +462,13 @@ def reset_response():
             argumentsToRender = [eMail, resetCode]
             msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
             mail.send(msg)
-            return render_template('reset_response.html')
+            return render_template('resetResponse.html')
         else:
             flash('This email address is not in our records. You may either try again or contact your admin for assistance.','warning')
-            return render_template('reset_request.html')
+            return render_template('resetRequest.html')
 
-@app.route('/reset_validate', methods=('GET', 'POST'))
-def reset_validate():
+@app.route('/resetValidate', methods=('GET', 'POST'))
+def resetValidate():
         if request.method == 'POST':
             resetCode = request.form['resetCode']
             newPassWord = request.form['newPassWord']
@@ -461,13 +497,13 @@ def reset_validate():
                 flash('Password must have at least one of the following special characters - + _ ! @ # $ % ^ & * . , ?','warning')
                 entryErrors = True
 
-             #return render_template('reset_response.html')
+             #return render_template('resetResponse.html')
             if entryErrors == True:
-                return render_template('reset_response.html',)
+                return render_template('resetResponse.html',)
             
             else:
                 #hit database for resetCode validity
-                conn = get_db_connection()
+                conn = getDBConnection()
                 resetCodeDB = conn.execute('SELECT resetCode FROM facilityDBUsers WHERE resetCode = ?',(resetCode,)).fetchone()
                 conn.close()
                 if resetCodeDB is not None:
@@ -485,7 +521,7 @@ def reset_validate():
 
                     #update the resetStatus to 0
                     #update the resetCode to none
-                    conn = get_db_connection()
+                    conn = getDBConnection()
                     conn.execute('UPDATE facilityDBUsers SET passWord = ?, resetStatus = ?, resetCode = ? WHERE resetCode = ?',(newPassWord, '0', 'none', resetCode))
                     conn.commit()
                     conn.close()
@@ -493,12 +529,12 @@ def reset_validate():
                     return render_template('login.html')
                 else:
                     flash('Your reset request failed. Please be sure you are using the right reset code.','danger')
-                    return render_template('reset_response.html')
+                    return render_template('resetResponse.html')
 
-@app.route("/pdf_list")
-def pdf_list():
+@app.route("/pdfList")
+def pdfList():
     # Run the inventory query
-    conn = get_db_connection()
+    conn = getDBConnection()
     facilityDBInventory = conn.execute('SELECT category, item, goal, have FROM facilityDBInventory').fetchall()
     conn.close()
 
