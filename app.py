@@ -124,6 +124,13 @@ def admin():
     conn.close()
     return render_template('admin.html', facilityDBInventory=facilityDBInventory,facilityDBCategory=facilityDBCategory)
 
+@app.route('/user_admin')
+def user_admin():
+    conn = get_db_connection()
+    facilityDBUsers = conn.execute('SELECT * FROM facilityDBUsers').fetchall()
+    conn.close()
+    return render_template('user_admin.html', facilityDBUsers=facilityDBUsers)
+
 # Create
 @app.route('/create', methods=('GET', 'POST'))
 def create():
