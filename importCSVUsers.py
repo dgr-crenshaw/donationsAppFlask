@@ -2,6 +2,7 @@
 import sqlite3  # For SQLite database operations
 import csv      # For handling CSV files
 
+#conn = sqlite3.connect('facilityDB.db')
 conn = sqlite3.connect('/home/dgrCrenshaw/donationsAppFlask/facilityDB.db')
 
 # Create a cursor object to execute SQL commands

@@ -1,6 +1,8 @@
 import sqlite3
 
+#conn = sqlite3.connect('facilityDB.db')
 conn = sqlite3.connect('/home/dgrCrenshaw/donationsAppFlask/facilityDB.db')
+
 cur = conn.cursor()
 cur.execute('SELECT * FROM facilityDBInventory')
 rows = cur.fetchall()

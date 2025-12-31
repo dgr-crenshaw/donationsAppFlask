@@ -11,7 +11,7 @@
 
     {% else %}
 
-        <p>Download and print a <a href="{{ url_for('pdf_inventory')}}" target="_blank">shopping list</a></p>
+        <p>Download and print a <a href="{{ url_for('pdfList')}}" target="_blank">shopping list</a></p>
 
     {% for categoryEntry in facilityDBCategory %}
         <h3>{{ categoryEntry['category'] }}</h3>

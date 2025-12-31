@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1>{% block title %} 66 West Donations User Management {% endblock %}</h1>
+
+    {% if not session['logged_in'] %}
+
+        <p>You must be logged in to access this function.<br>
+        <p>Please <a href="{{ url_for('login')}}">login</a></p>
+
+    {% else %}
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>User First Name</th>
+                <th>User Last Name</th>
+                <th>User Email</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for itemEntry in facilityDBUsers %}
+                <tr>
+
+                        <td>{{ itemEntry['id']}}</td>
+                        <td>{{ itemEntry['firstName']}}</td>
+                        <td>{{ itemEntry['lastName']}}</td>
+                        <td>{{ itemEntry['eMail']}}</td>
+                        <td>{{ itemEntry['userName']}}</td>
+                        <td><a href="{{ url_for('editUser', id=itemEntry['id']) }}">Edit</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+    {% endif %}
+{% endblock %}
