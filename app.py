@@ -15,6 +15,9 @@ from datetime import datetime
 
 from flask_mail import Mail, Message
 
+import os
+from flask import send_from_directory
+
 now = datetime.now() # current date NOT TIME since time must be server local
 #dateTime = now.strftime("%m/%d/%Y, %I:%M %p")
 dateTime = now.strftime("%m/%d/%Y")
@@ -109,6 +112,11 @@ app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
 app.config['SECRET_KEY'] = '917190101'
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),'favicon.ico')
 
 @app.route('/')
 def index():
