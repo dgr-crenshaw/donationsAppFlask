@@ -113,7 +113,6 @@ mail = Mail(app)
 
 app.config['SECRET_KEY'] = '917190101'
 
-
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),'favicon.ico')
@@ -190,8 +189,8 @@ def categories():
     conn.close()
     return render_template('categories.html', facilityDBCategory=facilityDBCategory)
 
-@app.route('/delete_empty_category', methods=('GET', 'POST'))
-def delete_empty_category():
+@app.route('/deleteEmptyCategory', methods=('GET', 'POST'))
+def deleteEmptyCategory():
     if request.method == 'POST':
         toDelete = (request.form.getlist('cbox[]'))
         toDelete = [category for category in zip(*[iter(toDelete)])]
@@ -209,7 +208,7 @@ def delete_empty_category():
 
         flash('"{}" successfully deleted!'.format(toDelete),'info')
 
-        return render_template('delete_empty_category.html', emptyCategoryList=emptyCategoryList)
+        return render_template('deleteEmptyCategory.html', emptyCategoryList=emptyCategoryList)
     else:
         conn = getDBConnection()
         checkInventory = conn.execute('SELECT category FROM facilityDBInventory').fetchall()
@@ -219,7 +218,7 @@ def delete_empty_category():
         deduplicatedCheckInventory = list(set(checkInventory))
         emptyCategoryList = list(set(checkCategories).difference(deduplicatedCheckInventory))
 
-        return render_template('delete_empty_category.html', emptyCategoryList=emptyCategoryList)
+        return render_template('deleteEmptyCategory.html', emptyCategoryList=emptyCategoryList)
 
 @app.route('/inventory')
 def inventory():
@@ -321,7 +320,7 @@ def authenticate():
 @app.route('/logout')
 def logout():
     session['logged_in'] = False
-    return render_template('login.html')
+    return render_template('index.html')
 
 @app.route('/register', methods=('GET', 'POST'))
 def register():
