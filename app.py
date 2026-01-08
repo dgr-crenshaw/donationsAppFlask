@@ -322,6 +322,7 @@ def authenticate():
 @app.route('/logout')
 def logout():
     session['logged_in'] = False
+    session['permissions'] = 'N'
     return render_template('index.html')
 
 @app.route('/register', methods=('GET', 'POST'))

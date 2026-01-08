@@ -25,47 +25,48 @@
 
             <ul class="navbar-nav">
 
-                {% if session['logged_in'] == True: %}
+{% if session['logged_in'] == False or session['permissions'] == 'N' or session['permissions'] == 'A'  or session['permissions'] == 'S': %}
+<li class="nav-item active">
+<a class="nav-link" href="{{ url_for('shop')}}">Shopping List</a>
+</li>
+{% endif %}
 
-                <li class="nav-item active">
-                  <a class="nav-link" href="{{ url_for('shop')}}">Shopping List</a>
-                </li>                
+{% if session['logged_in'] == False: %}
+<li class="nav-item active">
+<a class="nav-link" href="{{ url_for('login')}}">Login</a>
+</li>
+{% endif %}
 
-                <li class="nav-item active">
-                  <a class="nav-link" href="{{ url_for('admin')}}">Inventory Management</a>
-                </li>
+{% if session['logged_in'] == True and (session['permissions'] == 'S' or session['permissions'] == 'A'): %}
+<li class="nav-item active">
+<a class="nav-link" href="{{ url_for('admin')}}">Inventory Management</a>
+</li>
 
-                <li class="nav-item active">
-                  <a class="nav-link" href="{{ url_for('create')}}">Add Item</a>
-                </li>
+<li class="nav-item active">
+<a class="nav-link" href="{{ url_for('create')}}">Add Item</a>
+</li>
 
-                <li class="nav-item active">
-                  <a class="nav-link" href="{{ url_for('add_category')}}">Add Category</a>
-                </li>
+<li class="nav-item active">
+<a class="nav-link" href="{{ url_for('add_category')}}">Add Category</a>
+</li>
 
-                <li class="nav-item active">
-                  <a class="nav-link" href="{{ url_for('deleteEmptyCategory')}}">Remove Unused Categories</a>
-                </li>
+<li class="nav-item active">
+<a class="nav-link" href="{{ url_for('deleteEmptyCategory')}}">Remove Unused Categories</a>
+</li>
+{% endif %}
 
-                {% if session['permissions'] == 'S': %}
-                <li class="nav-item active">
-                  <a class="nav-link" href="{{ url_for('register')}}">Register New User</a>
-                </li>
-                {% endif %}
-              
-                <li class="nav-item active">
-                  <a class="nav-link" href="{{ url_for('logout')}}">Logout</a>
-                </li>
+{% if session['logged_in'] == True and (session['permissions'] == 'S'): %}
+<li class="nav-item active">
+<a class="nav-link" href="{{ url_for('register')}}">Register New User</a>
+</li>
+{% endif %}
 
-              {% else %}
-                <li class="nav-item active">
-                  <a class="nav-link" href="{{ url_for('shop')}}">Shopping List</a>
-                </li>
+{% if session['logged_in'] == True: %}
+<li class="nav-item active">
+<a class="nav-link" href="{{ url_for('logout')}}">Logout</a>
+</li>
+{% endif %}
 
-                <li class="nav-item active">
-                  <a class="nav-link" href="{{ url_for('login')}}">Login</a>
-                </li>
-              {% endif %}
             </ul>
         </div>
     </nav>
