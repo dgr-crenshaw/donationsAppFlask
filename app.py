@@ -119,7 +119,7 @@ def favicon():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', session=session)
 
 @app.route('/shop')
 def shop():
@@ -302,7 +302,8 @@ def authenticate():
         conn.close()
 
         if userDBRows is not None:
-            pWordCheck = userDBRows[5]
+            permissions = userDBRows[5]
+            pWordCheck = userDBRows[6]
             pWordCheck = pWordCheck.encode('utf-8')
             pWordTest = bcrypt.checkpw(pWord,pWordCheck)
 
@@ -314,6 +315,7 @@ def authenticate():
              return render_template('login.html')
 
         session['logged_in'] = True
+        session['permissions'] = permissions
         flash('You are logged in. Use the extended menu to see your options.','info')
         return render_template('index.html')
 
@@ -329,6 +331,7 @@ def register():
         lastName = request.form['lastName']
         eMail = request.form['eMail']
         userName = request.form['userName']
+        permissions = request.form['permissions']
         passWord = request.form['passWord']
 
         #update values for entry to return
@@ -338,6 +341,7 @@ def register():
         'attributeValueLastName': lastName,
         'attributeValueEmailAddress': eMail,
         'attributeValueUserName': userName,
+        'attributeValuePermissions': permissions,
         'attributeValuePassWord': passWord
         }
 
@@ -408,7 +412,7 @@ def register():
             return render_template('register.html', contentDictionary=contentDictionary)
 
         else:
-            conn.execute('INSERT INTO facilityDBUsers VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)', (firstName, lastName, eMail, userName, passWordHash,'0','none'))
+            conn.execute('INSERT INTO facilityDBUsers VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)', (firstName, lastName, eMail, userName, permissions, passWordHash,'0','none'))
             conn.commit()
             conn.close()
 
@@ -422,6 +426,7 @@ def register():
         'attributeValueLastName': 'Last Name',
         'attributeValueEmailAddress': 'Email Address',
         'attributeValueUserName': 'User Name',
+        'attributeValuePermissions': 'Permissions',
         'attributeValuePassWord': 'Password'
     }
         return render_template('register.html', contentDictionary = contentDictionary)

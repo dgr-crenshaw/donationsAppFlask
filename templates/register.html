@@ -50,6 +50,15 @@
         </div>
 
         <div class="form-group">
+        <label for="permissions">Permissions:</label>
+        <select name="permissions" id="permissions">
+                <option value="N">View Only</option>
+                <option value="A">Edit Inventory</option>
+                <option value="S">Manage Users</option>
+        </select>
+    </div>
+
+        <div class="form-group">
         <label for="Password">Password</label>
                 <input type="password" name="passWord" {{ contentDictionary['attribute']}}="{{ contentDictionary['attributeValuePassWord'] }}"
                     class="form-control"
