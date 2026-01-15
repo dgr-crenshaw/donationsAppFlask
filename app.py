@@ -467,6 +467,8 @@ def resetResponse():
         else:
             flash('This email address is not in our records. You may either try again or contact your admin for assistance.','warning')
             return render_template('resetRequest.html')
+    else:
+        return render_template('resetResponse.html')
 
 @app.route('/resetValidate', methods=('GET', 'POST'))
 def resetValidate():
