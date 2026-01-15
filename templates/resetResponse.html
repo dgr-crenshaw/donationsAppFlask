@@ -2,11 +2,12 @@
 
 {% block content %}
 
-    <h1>Reset Your Password</h1>
+    <h1>Create a New or Reset a Lost Password</h1>
 
 
-        <p>You should have just received an email with password reset information. Once you have that email, enter your user name, reset code and a new password.</p>
+        <p>You should have just received an email with password create or reset information. Once you have that email, enter your user name, code and a password.</p>
         <p>If you are not a registered user, please contact the <a href="mailto:inventory.response@gmail.com?subject=I need access to the inventory functions">site admin</a>.</p>
+        
         <form action="{{ url_for('resetValidate') }}" method="POST">
 
         <div class="form-group">
@@ -18,7 +19,7 @@
                 <ul>
                     <li>Be at least 8 characters long.</li>
                     <li>Have at least one upper case letter.</li>
-                    <li>Have at least on numeral.</li>
+                    <li>Have at least one numeral.</li>
                     <li>Have at least one of the following special characters <em> - + _ ! @ # $ % ^ & * . , ?</em></li>
                 </ul>
 

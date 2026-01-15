@@ -333,7 +333,7 @@ def register():
         eMail = request.form['eMail']
         userName = request.form['userName']
         permissions = request.form['permissions']
-        passWord = request.form['passWord']
+        #passWord = request.form['passWord']
 
         #update values for entry to return
         contentDictionary = {
@@ -343,48 +343,48 @@ def register():
         'attributeValueEmailAddress': eMail,
         'attributeValueUserName': userName,
         'attributeValuePermissions': permissions,
-        'attributeValuePassWord': passWord
+        #'attributeValuePassWord': passWord
         }
 
         # converting password to array of bytes
-        passWordHash = passWord.encode('utf-8')
+        #passWordHash = passWord.encode('utf-8')
 
         # generating the salt
-        salt = bcrypt.gensalt()
+        #salt = bcrypt.gensalt()
 
         # Hashing the password
-        passWordHash = bcrypt.hashpw(passWordHash, salt)
+        #passWordHash = bcrypt.hashpw(passWordHash, salt)
 
         #convert it to a string for storage
-        passWordHash = str(passWordHash)
+        #passWordHash = str(passWordHash)
         #chop off first two characters
-        passWordHash = passWordHash[2:]
+        #passWordHash = passWordHash[2:]
 
         #begin entry error tests
 
         entryErrors = False #initialize
 
-        testPasswordTests = validatePassword(passWord)
+        #testPasswordTests = validatePassword(passWord)
         
         # test for length
-        if testPasswordTests.testPasswordLength():
-            flash('Password must be at least 8 characters!', 'warning')
-            entryErrors = True
+        #if testPasswordTests.testPasswordLength():
+        #    flash('Password must be at least 8 characters!', 'warning')
+        #    entryErrors = True
 
         # test for upper case
-        if testPasswordTests.testPasswordUpperCase():
-            flash('Password must have at least one upper case character.','warning')
-            entryErrors = True
+        #if testPasswordTests.testPasswordUpperCase():
+        #    flash('Password must have at least one upper case character.','warning')
+        #    entryErrors = True
 
         # test for digits
-        if testPasswordTests.testPasswordNumeric():
-            flash('Password must have at least one number.','warning')
-            entryErrors = True
+        #if testPasswordTests.testPasswordNumeric():
+        #    flash('Password must have at least one number.','warning')
+        #    entryErrors = True
 
         # test for special chars
-        if testPasswordTests.testPasswordSpecial():
-            flash('Password must have at least one of the following special characters - + _ ! @ # $ % ^ & * . , ?','warning')
-            entryErrors = True
+        #if testPasswordTests.testPasswordSpecial():
+        #    flash('Password must have at least one of the following special characters - + _ ! @ # $ % ^ & * . , ?','warning')
+        #    entryErrors = True
 
         conn = getDBConnection()
         account = conn.execute('SELECT * FROM facilityDBUsers WHERE username = ?', (userName,)).fetchone()
@@ -405,7 +405,7 @@ def register():
             entryErrors = True
 
         #test if requred field not complete
-        if not userName or not passWord or not eMail:
+        if not userName or not eMail:
             flash('Please fill out the required fields on the form!','warning')
             entryErrors = True
 
@@ -413,11 +413,25 @@ def register():
             return render_template('register.html', contentDictionary=contentDictionary)
 
         else:
-            conn.execute('INSERT INTO facilityDBUsers VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)', (firstName, lastName, eMail, userName, permissions, passWordHash,'0','none'))
+            #create a code
+            randomLettersDigits = string.ascii_letters + string.digits
+            resetCode = ''.join(random.choice(randomLettersDigits) for index in range(7))
+         	#update database
+            resetStatus = 1
+
+            conn.execute('INSERT INTO facilityDBUsers VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)', (firstName, lastName, eMail, userName, permissions,'$2a$12$6fdvh9u0WVr3hWRLh5dsSeYWfgbqKQc8Bg9nfrieMJCi4K72y4vAy', resetStatus, resetCode))
             conn.commit()
             conn.close()
+        	
+         	#compose email
+             
+            sendTo = eMail
+            msg = Message('Responding to password creation or reset request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
+            argumentsToRender = [eMail, resetCode]
+            msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
+            mail.send(msg)
 
-            flash('You have successfully registered!','success')
+            flash('You have successfully registered {eMail}!','success')
             return render_template('register.html',contentDictionary=contentDictionary)
 
     elif request.method == 'GET':
@@ -428,7 +442,7 @@ def register():
         'attributeValueEmailAddress': 'Email Address',
         'attributeValueUserName': 'User Name',
         'attributeValuePermissions': 'Permissions',
-        'attributeValuePassWord': 'Password'
+        #'attributeValuePassWord': 'Password'
     }
         return render_template('register.html', contentDictionary = contentDictionary)
 
@@ -438,6 +452,42 @@ def checkUsers():
     facilityDBUsers = conn.execute('SELECT * FROM facilityDBUsers').fetchall()
     conn.close()
     return render_template('checkUsers.html', facilityDBUsers=facilityDBUsers)
+
+##### new user set password
+@app.route('/newPassword', methods=('GET', 'POST'))
+def newPassword():
+    if request.method == 'POST':
+        eMail = request.form['eMail']
+        userName = request.form['userName']
+
+        # search db for username
+        conn = getDBConnection()
+
+        emailExists = conn.execute('SELECT eMail FROM facilityDBUsers WHERE eMail = ? AND userName = ?',(eMail,userName)).fetchone()
+        conn.close()
+        if emailExists is not None:
+            flash('We found your email address in our records. We will send an email to that address with password recovery instructions.','success')
+            randomLettersDigits = string.ascii_letters + string.digits
+            resetCode = ''.join(random.choice(randomLettersDigits) for index in range(7))
+         	#update database
+            resetStatus = 1
+            conn = getDBConnection()
+            conn.execute('UPDATE facilityDBUsers SET resetStatus = ?, resetCode = ? WHERE eMail = ?',(resetStatus, resetCode, eMail))
+            conn.commit()
+            conn.close()
+        	
+         	#compose email
+             
+            sendTo = str(emailExists[0])
+            msg = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
+            argumentsToRender = [eMail, resetCode]
+            msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
+            mail.send(msg)
+            return render_template('resetResponse.html')
+        else:
+            flash('This email address is not in our records. You may either try again or contact your admin for assistance.','warning')
+            return render_template('resetRequest.html')
+
 
 ##### user requests reset
 @app.route('/resetRequest')
@@ -479,6 +529,8 @@ def resetResponse():
         else:
             flash('This email address is not in our records. You may either try again or contact your admin for assistance.','warning')
             return render_template('resetRequest.html')
+    else:
+        return render_template('resetResponse.html')
 
 @app.route('/resetValidate', methods=('GET', 'POST'))
 def resetValidate():

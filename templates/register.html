@@ -13,6 +13,7 @@
 
     <form action="{{ url_for('register') }}" method="post">
 
+
         <!--div class="form-group">
             <label for="firstName">First Name</label>
                     <input type="text" name="firstName" placeholder="First Name"
@@ -49,7 +50,7 @@
                     required>
         </div>
 
-        <div class="form-group">
+    <div class="form-group">
         <label for="permissions">Permissions:</label>
         <select name="permissions" id="permissions">
                 <option value="N">View Only</option>
@@ -58,23 +59,12 @@
         </select>
     </div>
 
-        <div class="form-group">
-        <label for="Password">Password</label>
-                <input type="password" name="passWord" {{ contentDictionary['attribute']}}="{{ contentDictionary['attributeValuePassWord'] }}"
-                    class="form-control"
-                    required>
-        </div>
-            <p>When you create your password, keep in mind that it must pass all the following tests:</p>
-                <ul>
-                    <li>Be at least 8 characters long.</li>
-                    <li>Have at least one upper case letter.</li>
-                    <li>Have at least on numeral.</li>
-                    <li>Have at least one of the following special characters <em> - + _ ! @ # $ % ^ & * . , ?</em></li>
-                </ul>
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+    
     </form>
+    
     <!--div>
         {{ msg }}
     </div-->
