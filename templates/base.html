@@ -25,17 +25,15 @@
 
             <ul class="navbar-nav">
 
-{% if session['logged_in'] == False or session['permissions'] == 'N' or session['permissions'] == 'A'  or session['permissions'] == 'S': %}
   <li class="nav-item active">
     <a class="nav-link" href="{{ url_for('shop')}}">Shopping List</a>
-</li>
-{% endif %}
+  </li>
 
-{% if session['logged_in'] == False: %}
+  {% if session['logged_in'] != True: %}
   <li class="nav-item active">
-    <a class="nav-link" href="{{ url_for('login')}}">Login</a>
-</li>
-{% endif %}
+    <a class="nav-link" href="{{ url_for('login')}}">Admin Login</a>
+  </li>
+  {% endif %}
 
 {% if session['logged_in'] == True and (session['permissions'] == 'S' or session['permissions'] == 'A'): %}
   <li class="nav-item active">
@@ -86,7 +84,7 @@
         <div class="alert alert-danger">{{ message }}</div>
       {% endfor %}
     -->
-
+<!--p>Session Login Status: {{session['logged_in']}} </p-->
       {% block content %} {% endblock %}
     </div>
 

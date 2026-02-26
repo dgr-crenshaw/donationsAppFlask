@@ -45,6 +45,11 @@ def getUserID(userID):
         abort(404)
     return user
 
+def sendEmail(eMailAddress, eMailSender, eMailTextSource, eMailSubjectLine, resetCode):
+    msg = Message(eMailSubjectLine, sender = eMailSender, recipients = [eMailAddress])
+    msg.html = render_template(eMailTextSource, argumentsToRender = [eMailAddress, resetCode])
+    mail.send(msg)
+
 class validatePassword:
 
     def __init__(self, passWord):
@@ -119,6 +124,7 @@ def favicon():
 
 @app.route('/')
 def index():
+    session['logged in'] = True
     return render_template('index.html', session=session)
 
 @app.route('/shop')
@@ -424,12 +430,28 @@ def register():
             conn.close()
         	
          	#compose email
-             
-            sendTo = eMail
-            msg = Message('Responding to password creation or reset request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
-            argumentsToRender = [eMail, resetCode]
-            msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
-            mail.send(msg)
+            
+            #####
+            # def sendEmail(eMailAddress, eMailSender, eMailTextSource, eMailSubjectLine, resetCode):
+            #     msg = Message(eMailSubjectLine, sender = eMailSender, recipients = eMailAddress)
+            #     msg.html = render_template(eMailTextSource, argumentsToRender = [eMailAddress, resetCode])
+            #     mail.send(msg)
+            #####
+            
+            #####
+            eMailAddress = eMail
+            eMailSender = 'inventory.response@gmail.com'
+            eMailTextSource = 'emailCreationText.html'
+            eMailSubjectLine = 'Responding to password creation request'
+
+            sendEmail(eMailAddress, eMailSender, eMailTextSource, eMailSubjectLine, resetCode)
+            #####
+
+
+            # msg = Message('Responding to password creation or reset request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
+            # argumentsToRender = [eMail, resetCode]
+            # msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
+            # mail.send(msg)
 
             flash('You have successfully registered {eMail}!','success')
             return render_template('register.html',contentDictionary=contentDictionary)
@@ -483,7 +505,7 @@ def newPassword():
             argumentsToRender = [eMail, resetCode]
             msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
             mail.send(msg)
-            return render_template('resetResponse.html')
+            return render_template('resetPasswordResponse.html')
         else:
             flash('This email address is not in our records. You may either try again or contact your admin for assistance.','warning')
             return render_template('resetRequest.html')
@@ -521,16 +543,20 @@ def resetResponse():
          	#compose email
              
             sendTo = str(emailExists[0])
-            msg = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
-            argumentsToRender = [eMail, resetCode]
-            msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
-            mail.send(msg)
-            return render_template('resetResponse.html')
+
+            # msg = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
+            # argumentsToRender = [eMail, resetCode]
+            # msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
+            # mail.send(msg)
+
+            sendEmail(eMailAddress, eMailSender, eMailTextSource, eMailSubjectLine, resetCode)
+
+            return render_template('resetPasswordResponse.html')
         else:
             flash('This email address is not in our records. You may either try again or contact your admin for assistance.','warning')
             return render_template('resetRequest.html')
     else:
-        return render_template('resetResponse.html')
+        return render_template('resetPasswordResponse.html')
 
 @app.route('/resetValidate', methods=('GET', 'POST'))
 def resetValidate():
@@ -562,9 +588,9 @@ def resetValidate():
                 flash('Password must have at least one of the following special characters - + _ ! @ # $ % ^ & * . , ?','warning')
                 entryErrors = True
 
-             #return render_template('resetResponse.html')
+             #return render_template('resetPasswordResponse.html')
             if entryErrors == True:
-                return render_template('resetResponse.html',)
+                return render_template('resetPasswordResponse.html',)
             
             else:
                 #hit database for resetCode validity
@@ -594,7 +620,7 @@ def resetValidate():
                     return render_template('login.html')
                 else:
                     flash('Your reset request failed. Please be sure you are using the right reset code.','danger')
-                    return render_template('resetResponse.html')
+                    return render_template('resetPasswordResponse.html')
 
 @app.route("/pdfList")
 def pdfList():
