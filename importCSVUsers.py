@@ -2,7 +2,6 @@
 import sqlite3  # For SQLite database operations
 import csv      # For handling CSV files
 
-#conn = sqlite3.connect('facilityDB.db')
 conn = sqlite3.connect('/home/dgrCrenshaw/donationsAppFlask/facilityDB.db')
 
 # Create a cursor object to execute SQL commands
@@ -16,6 +15,7 @@ CREATE TABLE IF NOT EXISTS facilityDBUsers (
     lastName TEXT,
     eMail TEXT,
     userName TEXT,
+    permissions TEXT,
     passWord TEXT,
     resetStatus BOOL,
     resetCode TEXT
@@ -34,7 +34,7 @@ with open('csvUsersForExport.csv', 'r') as file:
     for row in csv_reader:
         print(row)
         cursor.execute('''
-        INSERT INTO facilityDBUsers (id, firstName, lastName, eMail, userName, passWord, resetStatus, resetCode) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO facilityDBUsers (id, firstName, lastName, eMail, userName, permissions, passWord, resetStatus, resetCode) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', row)
 
 # Commit changes and close the connection

@@ -15,6 +15,9 @@ from datetime import datetime
 
 from flask_mail import Mail, Message
 
+import os
+from flask import send_from_directory
+
 now = datetime.now() # current date NOT TIME since time must be server local
 #dateTime = now.strftime("%m/%d/%Y, %I:%M %p")
 dateTime = now.strftime("%m/%d/%Y")
@@ -22,7 +25,6 @@ dateTime = now.strftime("%m/%d/%Y")
 titleHeader = "66 West"
 
 def getDBConnection():
-    #conn = sqlite3.connect('facilityDB.db')
     conn = sqlite3.connect('/home/dgrCrenshaw/donationsAppFlask/facilityDB.db')
     conn.row_factory = sqlite3.Row
     return conn
@@ -42,6 +44,11 @@ def getUserID(userID):
     if user is None:
         abort(404)
     return user
+
+def sendEmail(eMailAddress, eMailSender, eMailTextSource, eMailSubjectLine, resetCode):
+    msg = Message(eMailSubjectLine, sender = eMailSender, recipients = [eMailAddress])
+    msg.html = render_template(eMailTextSource, argumentsToRender = [eMailAddress, resetCode])
+    mail.send(msg)
 
 class validatePassword:
 
@@ -111,9 +118,14 @@ mail = Mail(app)
 
 app.config['SECRET_KEY'] = '917190101'
 
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),'favicon.ico')
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    session['logged in'] = True
+    return render_template('index.html', session=session)
 
 @app.route('/shop')
 def shop():
@@ -183,8 +195,8 @@ def categories():
     conn.close()
     return render_template('categories.html', facilityDBCategory=facilityDBCategory)
 
-@app.route('/delete_empty_category', methods=('GET', 'POST'))
-def delete_empty_category():
+@app.route('/deleteEmptyCategory', methods=('GET', 'POST'))
+def deleteEmptyCategory():
     if request.method == 'POST':
         toDelete = (request.form.getlist('cbox[]'))
         toDelete = [category for category in zip(*[iter(toDelete)])]
@@ -202,7 +214,7 @@ def delete_empty_category():
 
         flash('"{}" successfully deleted!'.format(toDelete),'info')
 
-        return render_template('delete_empty_category.html', emptyCategoryList=emptyCategoryList)
+        return render_template('deleteEmptyCategory.html', emptyCategoryList=emptyCategoryList)
     else:
         conn = getDBConnection()
         checkInventory = conn.execute('SELECT category FROM facilityDBInventory').fetchall()
@@ -212,7 +224,7 @@ def delete_empty_category():
         deduplicatedCheckInventory = list(set(checkInventory))
         emptyCategoryList = list(set(checkCategories).difference(deduplicatedCheckInventory))
 
-        return render_template('delete_empty_category.html', emptyCategoryList=emptyCategoryList)
+        return render_template('deleteEmptyCategory.html', emptyCategoryList=emptyCategoryList)
 
 @app.route('/inventory')
 def inventory():
@@ -296,7 +308,8 @@ def authenticate():
         conn.close()
 
         if userDBRows is not None:
-            pWordCheck = userDBRows[5]
+            permissions = userDBRows[5]
+            pWordCheck = userDBRows[6]
             pWordCheck = pWordCheck.encode('utf-8')
             pWordTest = bcrypt.checkpw(pWord,pWordCheck)
 
@@ -308,13 +321,15 @@ def authenticate():
              return render_template('login.html')
 
         session['logged_in'] = True
+        session['permissions'] = permissions
         flash('You are logged in. Use the extended menu to see your options.','info')
         return render_template('index.html')
 
 @app.route('/logout')
 def logout():
     session['logged_in'] = False
-    return render_template('login.html')
+    session['permissions'] = 'N'
+    return render_template('index.html')
 
 @app.route('/register', methods=('GET', 'POST'))
 def register():
@@ -323,7 +338,8 @@ def register():
         lastName = request.form['lastName']
         eMail = request.form['eMail']
         userName = request.form['userName']
-        passWord = request.form['passWord']
+        permissions = request.form['permissions']
+        #passWord = request.form['passWord']
 
         #update values for entry to return
         contentDictionary = {
@@ -332,48 +348,49 @@ def register():
         'attributeValueLastName': lastName,
         'attributeValueEmailAddress': eMail,
         'attributeValueUserName': userName,
-        'attributeValuePassWord': passWord
+        'attributeValuePermissions': permissions,
+        #'attributeValuePassWord': passWord
         }
 
         # converting password to array of bytes
-        passWordHash = passWord.encode('utf-8')
+        #passWordHash = passWord.encode('utf-8')
 
         # generating the salt
-        salt = bcrypt.gensalt()
+        #salt = bcrypt.gensalt()
 
         # Hashing the password
-        passWordHash = bcrypt.hashpw(passWordHash, salt)
+        #passWordHash = bcrypt.hashpw(passWordHash, salt)
 
         #convert it to a string for storage
-        passWordHash = str(passWordHash)
+        #passWordHash = str(passWordHash)
         #chop off first two characters
-        passWordHash = passWordHash[2:]
+        #passWordHash = passWordHash[2:]
 
         #begin entry error tests
 
         entryErrors = False #initialize
 
-        testPasswordTests = validatePassword(passWord)
+        #testPasswordTests = validatePassword(passWord)
 
         # test for length
-        if testPasswordTests.testPasswordLength():
-            flash('Password must be at least 8 characters!', 'warning')
-            entryErrors = True
+        #if testPasswordTests.testPasswordLength():
+        #    flash('Password must be at least 8 characters!', 'warning')
+        #    entryErrors = True
 
         # test for upper case
-        if testPasswordTests.testPasswordUpperCase():
-            flash('Password must have at least one upper case character.','warning')
-            entryErrors = True
+        #if testPasswordTests.testPasswordUpperCase():
+        #    flash('Password must have at least one upper case character.','warning')
+        #    entryErrors = True
 
         # test for digits
-        if testPasswordTests.testPasswordNumeric():
-            flash('Password must have at least one number.','warning')
-            entryErrors = True
+        #if testPasswordTests.testPasswordNumeric():
+        #    flash('Password must have at least one number.','warning')
+        #    entryErrors = True
 
         # test for special chars
-        if testPasswordTests.testPasswordSpecial():
-            flash('Password must have at least one of the following special characters - + _ ! @ # $ % ^ & * . , ?','warning')
-            entryErrors = True
+        #if testPasswordTests.testPasswordSpecial():
+        #    flash('Password must have at least one of the following special characters - + _ ! @ # $ % ^ & * . , ?','warning')
+        #    entryErrors = True
 
         conn = getDBConnection()
         account = conn.execute('SELECT * FROM facilityDBUsers WHERE username = ?', (userName,)).fetchone()
@@ -394,7 +411,7 @@ def register():
             entryErrors = True
 
         #test if requred field not complete
-        if not userName or not passWord or not eMail:
+        if not userName or not eMail:
             flash('Please fill out the required fields on the form!','warning')
             entryErrors = True
 
@@ -402,11 +419,41 @@ def register():
             return render_template('register.html', contentDictionary=contentDictionary)
 
         else:
-            conn.execute('INSERT INTO facilityDBUsers VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)', (firstName, lastName, eMail, userName, passWordHash,'0','none'))
+            #create a code
+            randomLettersDigits = string.ascii_letters + string.digits
+            resetCode = ''.join(random.choice(randomLettersDigits) for index in range(7))
+         	#update database
+            resetStatus = 1
+
+            conn.execute('INSERT INTO facilityDBUsers VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)', (firstName, lastName, eMail, userName, permissions,'$2a$12$6fdvh9u0WVr3hWRLh5dsSeYWfgbqKQc8Bg9nfrieMJCi4K72y4vAy', resetStatus, resetCode))
             conn.commit()
             conn.close()
 
-            flash('You have successfully registered!','success')
+         	#compose email
+
+            #####
+            # def sendEmail(eMailAddress, eMailSender, eMailTextSource, eMailSubjectLine, resetCode):
+            #     msg = Message(eMailSubjectLine, sender = eMailSender, recipients = eMailAddress)
+            #     msg.html = render_template(eMailTextSource, argumentsToRender = [eMailAddress, resetCode])
+            #     mail.send(msg)
+            #####
+
+            #####
+            eMailAddress = eMail
+            eMailSender = 'inventory.response@gmail.com'
+            eMailTextSource = 'emailCreationText.html'
+            eMailSubjectLine = 'Responding to password creation request'
+
+            sendEmail(eMailAddress, eMailSender, eMailTextSource, eMailSubjectLine, resetCode)
+            #####
+
+
+            # msg = Message('Responding to password creation or reset request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
+            # argumentsToRender = [eMail, resetCode]
+            # msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
+            # mail.send(msg)
+
+            flash('You have successfully registered {eMail}!','success')
             return render_template('register.html',contentDictionary=contentDictionary)
 
     elif request.method == 'GET':
@@ -416,7 +463,8 @@ def register():
         'attributeValueLastName': 'Last Name',
         'attributeValueEmailAddress': 'Email Address',
         'attributeValueUserName': 'User Name',
-        'attributeValuePassWord': 'Password'
+        'attributeValuePermissions': 'Permissions',
+        #'attributeValuePassWord': 'Password'
     }
         return render_template('register.html', contentDictionary = contentDictionary)
 
@@ -426,6 +474,42 @@ def checkUsers():
     facilityDBUsers = conn.execute('SELECT * FROM facilityDBUsers').fetchall()
     conn.close()
     return render_template('checkUsers.html', facilityDBUsers=facilityDBUsers)
+
+##### new user set password
+@app.route('/newPassword', methods=('GET', 'POST'))
+def newPassword():
+    if request.method == 'POST':
+        eMail = request.form['eMail']
+        userName = request.form['userName']
+
+        # search db for username
+        conn = getDBConnection()
+
+        emailExists = conn.execute('SELECT eMail FROM facilityDBUsers WHERE eMail = ? AND userName = ?',(eMail,userName)).fetchone()
+        conn.close()
+        if emailExists is not None:
+            flash('We found your email address in our records. We will send an email to that address with password recovery instructions.','success')
+            randomLettersDigits = string.ascii_letters + string.digits
+            resetCode = ''.join(random.choice(randomLettersDigits) for index in range(7))
+         	#update database
+            resetStatus = 1
+            conn = getDBConnection()
+            conn.execute('UPDATE facilityDBUsers SET resetStatus = ?, resetCode = ? WHERE eMail = ?',(resetStatus, resetCode, eMail))
+            conn.commit()
+            conn.close()
+
+         	#compose email
+
+            sendTo = str(emailExists[0])
+            msg = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
+            argumentsToRender = [eMail, resetCode]
+            msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
+            mail.send(msg)
+            return render_template('resetPasswordResponse.html')
+        else:
+            flash('This email address is not in our records. You may either try again or contact your admin for assistance.','warning')
+            return render_template('resetRequest.html')
+
 
 ##### user requests reset
 @app.route('/resetRequest')
@@ -459,16 +543,20 @@ def resetResponse():
          	#compose email
 
             sendTo = str(emailExists[0])
-            msg = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
-            argumentsToRender = [eMail, resetCode]
-            msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
-            mail.send(msg)
-            return render_template('resetResponse.html')
+
+            # msg = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
+            # argumentsToRender = [eMail, resetCode]
+            # msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
+            # mail.send(msg)
+
+            sendEmail(eMailAddress, eMailSender, eMailTextSource, eMailSubjectLine, resetCode)
+
+            return render_template('resetPasswordResponse.html')
         else:
             flash('This email address is not in our records. You may either try again or contact your admin for assistance.','warning')
             return render_template('resetRequest.html')
     else:
-        return render_template('resetResponse.html')
+        return render_template('resetPasswordResponse.html')
 
 @app.route('/resetValidate', methods=('GET', 'POST'))
 def resetValidate():
@@ -500,9 +588,9 @@ def resetValidate():
                 flash('Password must have at least one of the following special characters - + _ ! @ # $ % ^ & * . , ?','warning')
                 entryErrors = True
 
-             #return render_template('resetResponse.html')
+             #return render_template('resetPasswordResponse.html')
             if entryErrors == True:
-                return render_template('resetResponse.html',)
+                return render_template('resetPasswordResponse.html',)
 
             else:
                 #hit database for resetCode validity
@@ -532,7 +620,7 @@ def resetValidate():
                     return render_template('login.html')
                 else:
                     flash('Your reset request failed. Please be sure you are using the right reset code.','danger')
-                    return render_template('resetResponse.html')
+                    return render_template('resetPasswordResponse.html')
 
 @app.route("/pdfList")
 def pdfList():

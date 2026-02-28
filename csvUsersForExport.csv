@@ -1,3 +1,4 @@
-id,firstName,lastName,eMail,userName,passWord,resetStatus,resetCode
-1,Don,Rideaux-Crenshaw,dgrc@crowswood.com,donR-C,$2a$12$QdG4EoGwNO/8eVIYn6lMVOGx40OKey1xEpudrZz.v1pB0kiygLQCW,0,none
-2,Susan,Lampe,sslampe68@gmail.com,SusanL,$2a$12$hpCjYqoeB.COZG8v53D9juyrSWlML1lUs.bnsrfmY5DKMEgoWtdBO, 0,none
+id,firstName,lastName,eMail,userName,permissions,passWord,resetStatus,resetCode
+1,Don,Rideaux-Crenshaw,dgrc@crowswood.com,donR-C,S,$2a$12$QdG4EoGwNO/8eVIYn6lMVOGx40OKey1xEpudrZz.v1pB0kiygLQCW,0,none
+2,Admin,Inventory,admin@inventory.com,AI,N,$2b$12$xXXXDlljnOHcqOOD/pvP0u2VmZPbCfHcY29qgI6NdeJQpKHSJb9Ue',0,none
+3, Alfred,Neuman,whatme@worry.com,alfredNeuman,A,$2b$12$.eFKlMtADR3KngakIhb2n.4pL3jFqdm/awYS76QR/QYQNsuWAJL0u',0,none

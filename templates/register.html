@@ -13,6 +13,7 @@
 
     <form action="{{ url_for('register') }}" method="post">
 
+
         <!--div class="form-group">
             <label for="firstName">First Name</label>
                     <input type="text" name="firstName" placeholder="First Name"
@@ -41,7 +42,7 @@
                     class="form-control"
                     required>
         </div>
-        
+
         <div class="form-group">
         <label for="firstName">User Name</label>
                 <input type="text" name="userName" {{ contentDictionary['attribute']}}="{{ contentDictionary['attributeValueUserName'] }}"
@@ -49,23 +50,21 @@
                     required>
         </div>
 
-        <div class="form-group">
-        <label for="Password">Password</label>
-                <input type="password" name="passWord" {{ contentDictionary['attribute']}}="{{ contentDictionary['attributeValuePassWord'] }}"
-                    class="form-control"
-                    required>
-        </div>
-            <p>When you create your password, keep in mind that it must pass all the following tests:</p>
-                <ul>
-                    <li>Be at least 8 characters long.</li>
-                    <li>Have at least one upper case letter.</li>
-                    <li>Have at least on numeral.</li>
-                    <li>Have at least one of the following special characters <em> - + _ ! @ # $ % ^ & * . , ?</em></li>
-                </ul>
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </div>
+    <div class="form-group">
+        <label for="permissions">Permissions:</label>
+        <select name="permissions" id="permissions">
+                <option value="N">View Only</option>
+                <option value="A">Edit Inventory</option>
+                <option value="S">Manage Users</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+
     </form>
+
     <!--div>
         {{ msg }}
     </div-->
@@ -73,5 +72,5 @@
     <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
 
     {% endif %}
-    
+
 {% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1>{% block title %} 66 West Remove Empty Categories {% endblock %}</h1>
+
+    {% if not session['logged_in'] %}
+
+        <p>You must be logged in to access this function.<br>
+        <p>Please <a href="{{ url_for('login')}}">login</a></p>
+
+    {% else %}
+
+        {% if emptyCategoryList == []%}
+            <p>No unused categries were found</p>
+        {% else %}
+            <form method="post">
+                <div class="form-group">
+                {% for categoryEntry in emptyCategoryList %}
+                    <input type="checkbox" id="{{ categoryEntry['category'] }}" name="cbox[]" value="{{ categoryEntry['category'] }}">
+                    <label for="{{ categoryEntry['category'] }}">{{ categoryEntry['category'] }}</label><br>
+                {% endfor %}
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </div>
+            </form>
+        {% endif %}
+    {% endif %}
+   {% endblock %}
