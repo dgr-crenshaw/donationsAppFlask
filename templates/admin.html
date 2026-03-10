@@ -34,7 +34,7 @@
                         <td>{{ itemEntry['item']}}</td>
                         <td>{{ itemEntry['have']}}</td>
                         <td>{{ itemEntry['goal']}}</td>
-                        <td><a href="{{ url_for('edit', id=itemEntry['id']) }}">Edit</a></td>
+                        <td><a href="{{ url_for('editItem', id=itemEntry['id']) }}">Edit</a></td>
                 </tr>
                     {% endif %}
             {% endfor %}

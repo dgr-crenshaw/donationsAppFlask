@@ -233,8 +233,8 @@ def inventory():
     conn.close()
     return render_template('inventory.html', facilityDBInventory=facilityDBInventory)
 
-@app.route('/<int:id>/delete', methods=('POST',))
-def delete(id):
+@app.route('/<int:id>/deleteItem', methods=('POST',))
+def deleteItem(id):
     itemID = getItemID(id)
     conn = getDBConnection()
     conn.execute('DELETE FROM facilityDBInventory WHERE id=? ',(id,))
@@ -253,8 +253,8 @@ def deleteUser(id):
     flash('"{}" successfully deleted!'.format(userID['userName']),'info')
     return redirect(url_for('userAdmin'))
 
-@app.route('/<int:id>/edit', methods=('GET', 'POST'))
-def edit(id):
+@app.route('/<int:id>/editItem', methods=('GET', 'POST'))
+def editItem(id):
     item = getItemID(id)
     conn = getDBConnection()
     facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
@@ -269,7 +269,7 @@ def edit(id):
         conn.commit()
         conn.close()
         return redirect(url_for('admin'))
-    return render_template('edit.html', item=item, facilityDBCategory=facilityDBCategory)
+    return render_template('editItem.html', item=item, facilityDBCategory=facilityDBCategory)
 
 @app.route('/<int:id>/editUser', methods=('GET', 'POST'))
 def editUser(id):
