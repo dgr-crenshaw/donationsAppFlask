@@ -14,7 +14,7 @@
 
   </head>
   <body>
-
+    
     <nav class="navbar navbar-expand-md navbar-dark bg-secondary">
         <a class="navbar-brand" href="{{ url_for('index')}}">66 West Donations</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,7 +37,7 @@
 
 {% if session['logged_in'] == True and (session['permissions'] == 'S' or session['permissions'] == 'A'): %}
   <li class="nav-item active">
-    <a class="nav-link" href="{{ url_for('admin')}}">Inventory Management</a>
+    <a class="nav-link" href="{{ url_for('manageInventory')}}">Manage Inventory</a>
 </li>
 
   <li class="nav-item active">
@@ -45,7 +45,7 @@
 </li>
 
   <li class="nav-item active">
-    <a class="nav-link" href="{{ url_for('add_category')}}">Add Category</a>
+    <a class="nav-link" href="{{ url_for('addCategory')}}">Add Category</a>
   </li>
 
   <li class="nav-item active">
@@ -63,14 +63,14 @@
   <li class="nav-item active">
     <a class="nav-link" href="{{ url_for('logout')}}">Logout</a>
 </li>
-{% endif %}
+{% endif %} 
 
             </ul>
         </div>
     </nav>
     <div class="container">
       {% block pageTitle %} {% endblock %}
-
+          
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
@@ -78,7 +78,7 @@
           {% endfor %}
         {% endif %}
       {% endwith %}
-
+      
       <!--
       {% for message in get_flashed_messages() %}
         <div class="alert alert-danger">{{ message }}</div>

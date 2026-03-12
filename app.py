@@ -137,13 +137,13 @@ def shop():
 
 ##### Admin tools #####
 
-@app.route('/admin')
-def admin():
+@app.route('/manageInventory')
+def manageInventory():
     conn = getDBConnection()
     facilityDBInventory = conn.execute('SELECT * FROM facilityDBInventory').fetchall()
     facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
     conn.close()
-    return render_template('admin.html', facilityDBInventory=facilityDBInventory,facilityDBCategory=facilityDBCategory)
+    return render_template('inventoryManagement.html', facilityDBInventory=facilityDBInventory,facilityDBCategory=facilityDBCategory)
 
 @app.route('/userAdmin')
 def userAdmin():
@@ -164,7 +164,7 @@ def create():
         conn.execute('INSERT INTO facilityDBInventory (category, item, have, goal) VALUES (?, ?, ?, ?)',(newCategory, newItem, newHave, newNeed))
         conn.commit()
         conn.close()
-        return redirect(url_for('admin'))
+        return redirect(url_for('manageInventory'))
     else:
         conn = getDBConnection()
         facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
@@ -172,8 +172,8 @@ def create():
         return render_template('create.html',facilityDBCategory=facilityDBCategory)
 
 # Add New Category
-@app.route('/add_category', methods=('GET', 'POST'))
-def add_category():
+@app.route('/addCategory', methods=('GET', 'POST'))
+def addCategory():
     if request.method == 'POST':
         newCategory = request.form['category']
         conn = getDBConnection()
@@ -186,7 +186,7 @@ def add_category():
         conn = getDBConnection()
         facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
         conn.close()
-        return render_template('add_category.html',facilityDBCategory=facilityDBCategory)
+        return render_template('addCategory.html',facilityDBCategory=facilityDBCategory)
 
 @app.route('/categories')
 def categories():
@@ -233,15 +233,15 @@ def inventory():
     conn.close()
     return render_template('inventory.html', facilityDBInventory=facilityDBInventory)
 
-@app.route('/<int:id>/delete', methods=('POST',))
-def delete(id):
+@app.route('/<int:id>/deleteItem', methods=('POST',))
+def deleteItem(id):
     itemID = getItemID(id)
     conn = getDBConnection()
     conn.execute('DELETE FROM facilityDBInventory WHERE id=? ',(id,))
     conn.commit()
     conn.close()
     flash('"{}" successfully deleted!'.format(itemID['item']),'info')
-    return redirect(url_for('admin'))
+    return redirect(url_for('manageInventory'))
 
 @app.route('/<int:id>/deleteUser', methods=('POST',))
 def deleteUser(id):
@@ -253,8 +253,8 @@ def deleteUser(id):
     flash('"{}" successfully deleted!'.format(userID['userName']),'info')
     return redirect(url_for('userAdmin'))
 
-@app.route('/<int:id>/edit', methods=('GET', 'POST'))
-def edit(id):
+@app.route('/<int:id>/editItem', methods=('GET', 'POST'))
+def editItem(id):
     item = getItemID(id)
     conn = getDBConnection()
     facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
@@ -268,8 +268,9 @@ def edit(id):
         conn.execute('UPDATE facilityDBInventory SET item = ?, category = ?, have = ?, goal = ? WHERE id = ?',(item, category, have, goal, id))
         conn.commit()
         conn.close()
-        return redirect(url_for('admin'))
-    return render_template('edit.html', item=item, facilityDBCategory=facilityDBCategory)
+        return redirect(url_for('manageInventory'))
+    else:
+        return render_template('editItem.html', item=item, facilityDBCategory=facilityDBCategory)
 
 @app.route('/<int:id>/editUser', methods=('GET', 'POST'))
 def editUser(id):
