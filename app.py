@@ -137,13 +137,13 @@ def shop():
 
 ##### Admin tools #####
 
-@app.route('/admin')
-def admin():
+@app.route('/manageInventory')
+def manageInventory():
     conn = getDBConnection()
     facilityDBInventory = conn.execute('SELECT * FROM facilityDBInventory').fetchall()
     facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
     conn.close()
-    return render_template('admin.html', facilityDBInventory=facilityDBInventory,facilityDBCategory=facilityDBCategory)
+    return render_template('inventoryManagement.html', facilityDBInventory=facilityDBInventory,facilityDBCategory=facilityDBCategory)
 
 @app.route('/userAdmin')
 def userAdmin():
@@ -164,7 +164,7 @@ def create():
         conn.execute('INSERT INTO facilityDBInventory (category, item, have, goal) VALUES (?, ?, ?, ?)',(newCategory, newItem, newHave, newNeed))
         conn.commit()
         conn.close()
-        return redirect(url_for('admin'))
+        return redirect(url_for('manageInventory'))
     else:
         conn = getDBConnection()
         facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
@@ -241,7 +241,7 @@ def deleteItem(id):
     conn.commit()
     conn.close()
     flash('"{}" successfully deleted!'.format(itemID['item']),'info')
-    return redirect(url_for('admin'))
+    return redirect(url_for('manageInventory'))
 
 @app.route('/<int:id>/deleteUser', methods=('POST',))
 def deleteUser(id):
@@ -268,8 +268,10 @@ def editItem(id):
         conn.execute('UPDATE facilityDBInventory SET item = ?, category = ?, have = ?, goal = ? WHERE id = ?',(item, category, have, goal, id))
         conn.commit()
         conn.close()
-        return redirect(url_for('admin'))
-    return render_template('editItem.html', item=item, facilityDBCategory=facilityDBCategory)
+        return redirect(url_for('manageInventory'))  #FIX THIS
+        #return redirect(url_for('index'))
+    else:
+        return render_template('editItem.html', item=item, facilityDBCategory=facilityDBCategory)
 
 @app.route('/<int:id>/editUser', methods=('GET', 'POST'))
 def editUser(id):
