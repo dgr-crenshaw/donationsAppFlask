@@ -45,7 +45,7 @@
 </li>
 
   <li class="nav-item active">
-    <a class="nav-link" href="{{ url_for('add_category')}}">Add Category</a>
+    <a class="nav-link" href="{{ url_for('addCategory')}}">Add Category</a>
   </li>
 
   <li class="nav-item active">
@@ -56,6 +56,9 @@
 {% if session['logged_in'] == True and (session['permissions'] == 'S'): %}
   <li class="nav-item active">
     <a class="nav-link" href="{{ url_for('register')}}">Register New User</a>
+  </li>
+    <li class="nav-item active">
+    <a class="nav-link" href="{{ url_for('userAdmin')}}">Manage Existing Users</a>
   </li>
 {% endif %}
 

@@ -172,8 +172,8 @@ def create():
         return render_template('create.html',facilityDBCategory=facilityDBCategory)
 
 # Add New Category
-@app.route('/add_category', methods=('GET', 'POST'))
-def add_category():
+@app.route('/addCategory', methods=('GET', 'POST'))
+def addCategory():
     if request.method == 'POST':
         newCategory = request.form['category']
         conn = getDBConnection()
@@ -186,7 +186,7 @@ def add_category():
         conn = getDBConnection()
         facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
         conn.close()
-        return render_template('add_category.html',facilityDBCategory=facilityDBCategory)
+        return render_template('addCategory.html',facilityDBCategory=facilityDBCategory)
 
 @app.route('/categories')
 def categories():
@@ -268,8 +268,7 @@ def editItem(id):
         conn.execute('UPDATE facilityDBInventory SET item = ?, category = ?, have = ?, goal = ? WHERE id = ?',(item, category, have, goal, id))
         conn.commit()
         conn.close()
-        return redirect(url_for('manageInventory'))  #FIX THIS
-        #return redirect(url_for('index'))
+        return redirect(url_for('manageInventory'))
     else:
         return render_template('editItem.html', item=item, facilityDBCategory=facilityDBCategory)
 
