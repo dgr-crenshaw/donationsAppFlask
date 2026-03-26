@@ -51,6 +51,10 @@
   <li class="nav-item active">
     <a class="nav-link" href="{{ url_for('deleteEmptyCategory')}}">Remove Unused Categories</a>
   </li>
+
+    <li class="nav-item active">
+    <a class="nav-link" href="{{ url_for('resetRequest')}}">Request Password Reset</a>
+  </li>
 {% endif %}
 
 {% if session['logged_in'] == True and (session['permissions'] == 'S'): %}

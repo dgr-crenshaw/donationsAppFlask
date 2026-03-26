@@ -24,8 +24,27 @@ dateTime = now.strftime("%m/%d/%Y")
 
 titleHeader = "66 West"
 
+# Base folder where this app lives
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+# Path selection logic:
+# 1) environment variable FACILITY_DB_PATH (recommended for test & prod separation)
+# 2) fallback to local facilityDB.db next to app.py
+# 3) optional hard-coded path override for dev/test convenience
+DEFAULT_DB_PATH = os.path.join(BASE_DIR, 'facilityDB.db')
+
+# optional manual fallback for your test machine setup
+TEST_DB_PATH = '/home/dgrCrenshaw/donationsAppFlask/facilityDB.db'
+
+
 def getDBConnection():
-    conn = sqlite3.connect('facilityDB.db')
+    db_path = os.getenv('FACILITY_DB_PATH', DEFAULT_DB_PATH)
+
+    # if env var isn't set and test path exists, pick it
+    if db_path == DEFAULT_DB_PATH and os.path.exists(TEST_DB_PATH):
+        db_path = TEST_DB_PATH
+
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -426,33 +445,19 @@ def register():
          	#update database
             resetStatus = 1
 
-            conn.execute('INSERT INTO facilityDBUsers VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)', (firstName, lastName, eMail, userName, permissions,'$2a$12$6fdvh9u0WVr3hWRLh5dsSeYWfgbqKQc8Bg9nfrieMJCi4K72y4vAy', resetStatus, resetCode))
+            conn.execute('INSERT INTO facilityDBUsers VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)', (firstName, lastName, eMail, userName, permissions,'', resetStatus, resetCode))
             conn.commit()
             conn.close()
         	
          	#compose email
             
-            #####
-            # def sendEmail(eMailAddress, eMailSender, eMailTextSource, eMailSubjectLine, resetCode):
-            #     msg = Message(eMailSubjectLine, sender = eMailSender, recipients = eMailAddress)
-            #     msg.html = render_template(eMailTextSource, argumentsToRender = [eMailAddress, resetCode])
-            #     mail.send(msg)
-            #####
-            
-            #####
             eMailAddress = eMail
             eMailSender = 'inventory.response@gmail.com'
-            eMailTextSource = 'emailCreationText.html'
+            eMailTextSource = 'emailCreateText.html'
             eMailSubjectLine = 'Responding to password creation request'
 
             sendEmail(eMailAddress, eMailSender, eMailTextSource, eMailSubjectLine, resetCode)
             #####
-
-
-            # msg = Message('Responding to password creation or reset request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
-            # argumentsToRender = [eMail, resetCode]
-            # msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
-            # mail.send(msg)
 
             flash('You have successfully registered {eMail}!','success')
             return render_template('register.html',contentDictionary=contentDictionary)
@@ -519,8 +524,8 @@ def resetRequest():
 
 ##### response to request
 
-@app.route('/resetResponse', methods=('GET', 'POST'))
-def resetResponse():
+@app.route('/resetPasswordResponse', methods=('GET', 'POST'))
+def resetPasswordResponse():
     if request.method == 'POST':
         eMail = request.form['eMail']
         userName = request.form['userName']
@@ -543,12 +548,17 @@ def resetResponse():
         	
          	#compose email
              
-            sendTo = str(emailExists[0])
+            #sendTo = str(emailExists[0])
 
             # msg = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
             # argumentsToRender = [eMail, resetCode]
             # msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
             # mail.send(msg)
+
+            eMailAddress = eMail
+            eMailSender = 'inventory.response@gmail.com'
+            eMailTextSource = 'emailResetText.html'
+            eMailSubjectLine = 'Responding to password reset request'
 
             sendEmail(eMailAddress, eMailSender, eMailTextSource, eMailSubjectLine, resetCode)
 
