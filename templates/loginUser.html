@@ -11,7 +11,7 @@
     {% else %}
 
         <p>Log in here with your user name and password. If you are not a registered user contact the <a href="mailto:inventory.response@gmail.com?subject=I need access to the inventory functions">site admin</a> </p>
-        <form action="{{ url_for('authenticate') }}" method="POST">
+        <form action="{{ url_for('authenticateUser') }}" method="POST">
 
         <div class="form-group">
             <input type="username" name="username" placeholder="Username">
@@ -25,7 +25,7 @@
         </form>
 
         <p>Forgot your password? Click this <a href="{{ url_for('resetRequest') }}">Request Password Reset</a></p>
-        <!--p>If you are not a registered user go to the <a href="{{ url_for('register') }}">Register page</a></p-->
+        <!--p>If you are not a registered user go to the <a href="{{ url_for('registerUser') }}">Register page</a></p-->
     {% endif %}
 
 {% endblock %}

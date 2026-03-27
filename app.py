@@ -146,13 +146,13 @@ def index():
     session['logged in'] = True
     return render_template('index.html', session=session)
 
-@app.route('/shop')
-def shop():
+@app.route('/shoppinglist')
+def shoppingList():
     conn = getDBConnection()
     facilityDBInventory = conn.execute('SELECT * FROM facilityDBInventory').fetchall()
     facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
     conn.close()
-    return render_template('shop.html', facilityDBInventory=facilityDBInventory,facilityDBCategory=facilityDBCategory)
+    return render_template('shoppingList.html', facilityDBInventory=facilityDBInventory,facilityDBCategory=facilityDBCategory)
 
 ##### Admin tools #####
 
@@ -171,9 +171,9 @@ def userAdmin():
     conn.close()
     return render_template('userAdmin.html', facilityDBUsers=facilityDBUsers)
 
-# Create
-@app.route('/create', methods=('GET', 'POST'))
-def create():
+# Add Item
+@app.route('/addItem', methods=('GET', 'POST'))
+def addItem():
     if request.method == 'POST':
         newCategory = request.form['category']
         newItem = request.form['item']
@@ -188,7 +188,7 @@ def create():
         conn = getDBConnection()
         facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
         conn.close()
-        return render_template('create.html',facilityDBCategory=facilityDBCategory)
+        return render_template('addItem.html',facilityDBCategory=facilityDBCategory)
 
 # Add New Category
 @app.route('/addCategory', methods=('GET', 'POST'))
@@ -199,7 +199,7 @@ def addCategory():
         conn.execute('INSERT INTO facilityDBCategories (category) VALUES (?)',(newCategory,))
         conn.commit()
         conn.close()
-        return redirect(url_for('create'))
+        return redirect(url_for('addItem'))
 
     elif request.method == 'GET':
         conn = getDBConnection()
@@ -207,12 +207,12 @@ def addCategory():
         conn.close()
         return render_template('addCategory.html',facilityDBCategory=facilityDBCategory)
 
-@app.route('/categories')
-def categories():
+@app.route('/listCategories')
+def listCategories():
     conn = getDBConnection()
     facilityDBCategory = conn.execute('SELECT * FROM facilityDBCategories').fetchall()
     conn.close()
-    return render_template('categories.html', facilityDBCategory=facilityDBCategory)
+    return render_template('listCategories.html', facilityDBCategory=facilityDBCategory)
 
 @app.route('/deleteEmptyCategory', methods=('GET', 'POST'))
 def deleteEmptyCategory():
@@ -309,12 +309,12 @@ def editUser(id):
         return redirect(url_for('userAdmin'))
     return render_template('editUser.html', user=user)
 
-@app.route('/login')
-def login():
-    return render_template('login.html')
+@app.route('/loginUser')
+def loginUser():
+    return render_template('loginUser.html')
 
-@app.route('/authenticate', methods=('POST',))
-def authenticate():
+@app.route('/authenticateUser', methods=('POST',))
+def authenticateUser():
     if request.method == 'POST':
         uName = request.form['username']
         pWord = request.form['password']
@@ -335,24 +335,24 @@ def authenticate():
 
         elif userDBRows is None:
              flash('Login failed. This user name does not exist.','warning')
-             return render_template('login.html')
+             return render_template('loginUser.html')
         elif pWordTest == False:
              flash('login failed. This password is incorrect','warning')
-             return render_template('login.html')
+             return render_template('loginUser.html')
 
         session['logged_in'] = True
         session['permissions'] = permissions
         flash('You are logged in. Use the extended menu to see your options.','info')
         return render_template('index.html')
 
-@app.route('/logout')
-def logout():
+@app.route('/logoutUser')
+def logoutUser():
     session['logged_in'] = False
     session['permissions'] = 'N'
     return render_template('index.html')
 
-@app.route('/register', methods=('GET', 'POST'))
-def register():
+@app.route('/registerUser', methods=('GET', 'POST'))
+def registerUser():
     if request.method == 'POST':
         firstName = request.form['firstName']
         lastName = request.form['lastName']
@@ -472,7 +472,7 @@ def register():
         'attributeValuePermissions': 'Permissions',
         #'attributeValuePassWord': 'Password'
     }
-        return render_template('register.html', contentDictionary = contentDictionary)
+        return render_template('registerUser.html', contentDictionary = contentDictionary)
 
 @app.route('/checkUsers')
 def checkUsers():
@@ -628,7 +628,7 @@ def resetValidate():
                     conn.commit()
                     conn.close()
                     flash('Your password has been reset. You can now log into the website','success')
-                    return render_template('login.html')
+                    return render_template('loginUser.html')
                 else:
                     flash('Your reset request failed. Please be sure you are using the right reset code.','danger')
                     return render_template('resetPasswordResponse.html')
