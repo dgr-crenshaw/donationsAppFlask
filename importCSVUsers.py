@@ -35,9 +35,10 @@ with open("csvUsersForExport.csv", "r") as file:
         print(row)
         cursor.execute(
             """
-INSERT INTO facilityDBUsers (
-    id, firstName, lastName, eMail, userName, permissions, passWord, resetStatus, resetCode
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO facilityDBUsers
+(id, firstName, lastName, eMail,
+ userName, permissions, passWord, resetStatus, resetCode)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 """,
             row,
         )

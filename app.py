@@ -541,7 +541,8 @@ def registerUser():
 
         # test for special chars
         # if testPasswordTests.testPasswordSpecial():
-        #    flash('Password must have special chars: - + _ ! @ # $ % ^ & * . , ?', 'warning')
+        #    flash('Password must have special chars:
+        #    - + _ ! @ # $ % ^ & * . , ?', 'warning')
         #    entryErrors = True
 
         conn = getDBConnection()
@@ -589,20 +590,25 @@ def registerUser():
             # create a code
             randomLettersDigits = string.ascii_letters + string.digits
             resetCode = "".join(
-                random.choice(randomLettersDigits) for index in range(7)
+                random.choice(randomLettersDigits) for _ in range(7)
             )
             # update database
             resetStatus = 1
 
+            # Default bcrypt password hash
+            default_password = (
+                "$2a$12$2VGEB.3eVftC4UhHIOlZrOO0sDQJ9mpQ.olLVOqEbuW5lJYRZmBJ2"
+            )
             conn.execute(
-                "INSERT INTO facilityDBUsers VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO facilityDBUsers VALUES "
+                "(NULL, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     firstName,
                     lastName,
                     eMail,
                     userName,
                     permissions,
-                    "$2a$12$2VGEB.3eVftC4UhHIOlZrOO0sDQJ9mpQ.olLVOqEbuW5lJYRZmBJ2",
+                    default_password,
                     resetStatus,
                     resetCode,
                 ),
@@ -661,42 +667,6 @@ def newUserPassword():
     return render_template("newUserPassword.html")
 
 
-# @app.route('/newPasswordResponse', methods=('GET', 'POST'))
-# def newPasswordResponse():
-#     if request.method == 'POST':
-#         eMail = request.form['eMail']
-#         userName = request.form['userName']
-
-#         # search db for username
-#         conn = getDBConnection()
-
-#         emailExists = conn.execute('SELECT eMail FROM facilityDBUsers WHERE eMail = ? AND userName = ?',(eMail,userName)).fetchone()
-#         conn.close()
-#         if emailExists is not None:
-#             flash('We found your email address in our records. We will send an email '
-#                   'to that address with password recovery instructions.', 'success')
-#             randomLettersDigits = string.ascii_letters + string.digits
-#             resetCode = ''.join(random.choice(randomLettersDigits) for index in range(7))
-#          	#update database
-#             resetStatus = 1
-#             conn = getDBConnection()
-#             conn.execute('UPDATE facilityDBUsers SET resetStatus = ?, resetCode = ? WHERE eMail = ?',(resetStatus, resetCode, eMail))
-#             conn.commit()
-#             conn.close()
-
-#          	#compose email
-
-#             sendTo = str(emailExists[0])
-#             msg = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
-#             argumentsToRender = [userName, resetCode]
-#             msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
-#             mail.send(msg)
-#             return render_template('resetPasswordResponse.html')
-#         else:
-#             flash('This email address is not in our records. You may either try again or contact your admin for assistance.','warning')
-#             return render_template('resetRequest.html')
-
-
 # user requests reset
 @app.route("/resetRequest")
 def resetRequest():
@@ -723,37 +693,30 @@ def resetPasswordResponse():
         conn = getDBConnection()
 
         emailExists = conn.execute(
-            "SELECT eMail FROM facilityDBUsers WHERE eMail = ? AND userName = ?",
+            "SELECT eMail FROM facilityDBUsers "
+            "WHERE eMail = ? AND userName = ?",
             (eMail, userName),
         ).fetchone()
         conn.close()
         if emailExists is not None:
             flash(
-                "We found your email address in our records. We will send an email to that address with password recovery instructions.",
+                "Email found. Recovery instructions sent.",
                 "success",
             )
             randomLettersDigits = string.ascii_letters + string.digits
             resetCode = "".join(
-                random.choice(randomLettersDigits) for index in range(7)
+                random.choice(randomLettersDigits) for _ in range(7)
             )
             # update database
             resetStatus = 1
             conn = getDBConnection()
             conn.execute(
-                "UPDATE facilityDBUsers SET resetStatus = ?, resetCode = ? WHERE eMail = ?",
+                "UPDATE facilityDBUsers SET resetStatus = ?, "
+                "resetCode = ? WHERE eMail = ?",
                 (resetStatus, resetCode, eMail),
             )
             conn.commit()
             conn.close()
-
-            # compose email
-
-            # sendTo = str(emailExists[0])
-
-            # msg = Message('Responding to password reset request', sender = 'inventory.response@gmail.com', recipients = [sendTo])
-            # argumentsToRender = [eMail, resetCode]
-            # msg.html = render_template('emailText.html', argumentsToRender = argumentsToRender)
-            # mail.send(msg)
 
             eMailAddress = eMail
             eMailSender = "inventory.response@gmail.com"
@@ -772,8 +735,7 @@ def resetPasswordResponse():
             return render_template("resetPasswordResponse.html")
         else:
             flash(
-                "This email address is not in our records. You may either try again "
-                "or contact your admin for assistance.",
+                "Email not found. Try again or contact admin.",
                 "warning",
             )
             return render_template("resetRequest.html")
@@ -812,8 +774,7 @@ def resetValidate():
         # test for special chars
         if testNewPasswordTests.testPasswordSpecial():
             flash(
-                "Password must have at least one of the following special characters "
-                "- + _ ! @ # $ % ^ & * . , ?",
+                "Password must have a special character.",
                 "warning",
             )
             entryErrors = True
@@ -848,16 +809,18 @@ def resetValidate():
                 # update the resetStatus to 0
                 # update the resetCode to none
                 conn = getDBConnection()
+                update_query = (
+                    "UPDATE facilityDBUsers SET passWord = ?, "
+                    "resetStatus = ?, resetCode = ? WHERE resetCode = ?"
+                )
                 conn.execute(
-                    "UPDATE facilityDBUsers SET passWord = ?, resetStatus = ?, "
-                    "resetCode = ? WHERE resetCode = ?",
+                    update_query,
                     (newPassWord, "0", "none", resetCode),
                 )
                 conn.commit()
                 conn.close()
                 flash(
-                    "Your password has been set. If not logged in, you can now "
-                    "log into the website",
+                    "Password updated. Log in now.",
                     "success",
                 )
                 return render_template("loginUser.html")
