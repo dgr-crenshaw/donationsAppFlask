@@ -1,9 +1,9 @@
 import sqlite3
 
-conn = sqlite3.connect('facilityDB.db')
+conn = sqlite3.connect("facilityDB.db")
 cur = conn.cursor()
-cur.execute('SELECT * FROM facilityDBUsers')
+cur.execute("SELECT * FROM facilityDBUsers")
 rows = cur.fetchall()
 conn.close()
 for row in rows:
-   print(row)
+    print(row)

@@ -7,11 +7,11 @@
     {% if not session['logged_in'] %}
 
         <p>You must be logged in to access this function.<br>
-        <p>Please <a href="{{ url_for('login')}}">login</a></p>
+        <p>Please <a href="{{ url_for('loginUser')}}">login</a></p>
 
     {% else %}
 
-    <form action="{{ url_for('register') }}" method="post">
+    <form action="{{ url_for('registerUser') }}" method="post">
 
 
         <!--div class="form-group">
@@ -69,7 +69,7 @@
         {{ msg }}
     </div-->
 
-    <!--p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p-->
+    <!--p>Already have an account? <a href="{{ url_for('loginUser') }}">Login here</a></p-->
 
     {% endif %}
     

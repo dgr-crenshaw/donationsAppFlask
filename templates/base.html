@@ -68,7 +68,8 @@
 
 {% if session['logged_in'] == True: %}
   <li class="nav-item active">
-    <a class="nav-link" href="{{ url_for('logoutUser')}}">Logout</a>
+    <a class="nav-link" href="{{ url_for('logoutUser')}}">Logout {{session['user_name']}}
+</a>
 </li>
 {% endif %} 
 

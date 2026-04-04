@@ -1,15 +1,16 @@
 # Import required modules
 import sqlite3  # For SQLite database operations
-import csv      # For handling CSV files
+import csv  # For handling CSV files
 
-# Establish a connection to the SQLite database (creates the database if it doesn't exist)
-conn = sqlite3.connect('facilityDB.db')
+# Establish a connection to the SQLite database (creates the database if
+# it doesn't exist)
+conn = sqlite3.connect("facilityDB.db")
 
 # Create a cursor object to execute SQL commands
 cursor = conn.cursor()
 
 # Create a table (if it doesn't already exist)
-cursor.execute('''
+cursor.execute("""
 CREATE TABLE IF NOT EXISTS facilityDBInventory (
     id INTEGER PRIMARY KEY,
     category TEXT,
@@ -17,10 +18,10 @@ CREATE TABLE IF NOT EXISTS facilityDBInventory (
     goal INTEGER,
     have INTEGER
 )
-''')
+""")
 
 # Open the CSV file
-with open('csvInventoryForExport.csv', 'r') as file:
+with open("csvInventoryForExport.csv", "r") as file:
     # Create a CSV reader object
     csv_reader = csv.reader(file)
 
@@ -29,9 +30,14 @@ with open('csvInventoryForExport.csv', 'r') as file:
 
     # Insert each row into the table
     for row in csv_reader:
-        cursor.execute('''
-        INSERT INTO facilityDBInventory (id, category, item, goal, have) VALUES (?, ?, ?, ?, ?)
-        ''', row)
+        cursor.execute(
+            """
+INSERT INTO facilityDBInventory (
+    id, category, item, goal, have
+) VALUES (?, ?, ?, ?, ?)
+""",
+            row,
+        )
 
 # Commit changes and close the connection
 conn.commit()

@@ -10,8 +10,8 @@ conn = sqs.connect("secure.db")
 cursor = conn.cursor()
 
 # Standard SQLite operations work normally
-cursor.execute('CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)')
-cursor.execute('INSERT INTO users (name) VALUES (?)', ('Alice',))
+cursor.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)")
+cursor.execute("INSERT INTO users (name) VALUES (?)", ("Alice",))
 conn.commit()
 
 # Always close properly to ensure encryption
@@ -21,7 +21,7 @@ sqs.close(conn, "secure.db")
 conn = sqs.connect("secure.db")
 cursor = conn.cursor()
 
-cursor.execute('SELECT name FROM users WHERE id = 1')
+cursor.execute("SELECT name FROM users WHERE id = 1")
 user_name = cursor.fetchone()[0]
 print(f"User: {user_name}")
 
