@@ -24,8 +24,27 @@ dateTime = now.strftime("%m/%d/%Y")
 
 titleHeader = "66 West"
 
+# Base folder where this app lives
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+# Path selection logic:
+# 1) environment variable FACILITY_DB_PATH (recommended for test & prod separation)
+# 2) fallback to local facilityDB.db next to app.py
+# 3) optional hard-coded path override for dev/test convenience
+DEFAULT_DB_PATH = os.path.join(BASE_DIR, 'facilityDB.db')
+
+# optional manual fallback for your test machine setup
+TEST_DB_PATH = '/home/dgrCrenshaw/donationsAppFlask/facilityDB.db'
+
+
 def getDBConnection():
-    conn = sqlite3.connect('/home/dgrCrenshaw/donationsAppFlask/facilityDB.db')
+    db_path = os.getenv('FACILITY_DB_PATH', DEFAULT_DB_PATH)
+
+    # if env var isn't set and test path exists, pick it
+    if db_path == DEFAULT_DB_PATH and os.path.exists(TEST_DB_PATH):
+        db_path = TEST_DB_PATH
+
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
 
