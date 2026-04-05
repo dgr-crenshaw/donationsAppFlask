@@ -1,5 +1,6 @@
-from sqlitesec import SqliteSec
 import os
+
+from sqlitesec import SqliteSec
 
 # Initialize with your encryption key
 key = os.urandom(32)  # Generate a secure 256-bit key

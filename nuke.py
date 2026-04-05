@@ -1,6 +1,6 @@
+import csv
 import os
 import sqlite3
-import csv
 
 file_path = "facilityDB.db"
 if os.path.exists(file_path):

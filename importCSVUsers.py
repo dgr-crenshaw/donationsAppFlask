@@ -1,6 +1,6 @@
 # Import required modules
-import sqlite3  # For SQLite database operations
 import csv  # For handling CSV files
+import sqlite3  # For SQLite database operations
 
 conn = sqlite3.connect("facilityDB.db")
 

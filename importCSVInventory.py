@@ -1,6 +1,6 @@
 # Import required modules
-import sqlite3  # For SQLite database operations
 import csv  # For handling CSV files
+import sqlite3  # For SQLite database operations
 
 # Establish a connection to the SQLite database (creates the database if
 # it doesn't exist)

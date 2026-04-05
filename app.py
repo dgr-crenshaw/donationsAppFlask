@@ -1,31 +1,27 @@
-import sqlite3
-from flask import (
-    Flask,
-    render_template,
-    request,
-    url_for,
-    flash,
-    redirect,
-    session,
-    make_response,
-)
-from werkzeug.exceptions import abort
-import re
-import bcrypt
-
-import string
+import os
 import random
-
-from fpdf import FPDF
-from fpdf.fonts import FontFace
-from fpdf.enums import TableCellFillMode
-
+import re
+import sqlite3
+import string
 from datetime import datetime
 
+import bcrypt
+from flask import (
+    Flask,
+    flash,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    session,
+    url_for,
+)
 from flask_mail import Mail, Message
-
-import os
-from flask import send_from_directory
+from fpdf import FPDF
+from fpdf.enums import TableCellFillMode
+from fpdf.fonts import FontFace
+from werkzeug.exceptions import abort
 
 now = datetime.now()  # current date NOT TIME since time must be server local
 # dateTime = now.strftime("%m/%d/%Y, %I:%M %p")
