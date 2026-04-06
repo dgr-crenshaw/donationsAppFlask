@@ -1,27 +1,31 @@
-import os
-import random
-import re
 import sqlite3
-import string
-from datetime import datetime
-
-import bcrypt
 from flask import (
     Flask,
-    flash,
-    make_response,
-    redirect,
     render_template,
     request,
-    send_from_directory,
-    session,
     url_for,
+    flash,
+    redirect,
+    session,
+    make_response,
 )
-from flask_mail import Mail, Message
-from fpdf import FPDF
-from fpdf.enums import TableCellFillMode
-from fpdf.fonts import FontFace
 from werkzeug.exceptions import abort
+import re
+import bcrypt
+
+import string
+import random
+
+from fpdf import FPDF
+from fpdf.fonts import FontFace
+from fpdf.enums import TableCellFillMode
+
+from datetime import datetime
+
+from flask_mail import Mail, Message
+
+import os
+from flask import send_from_directory
 
 now = datetime.now()  # current date NOT TIME since time must be server local
 # dateTime = now.strftime("%m/%d/%Y, %I:%M %p")
@@ -816,7 +820,8 @@ def resetValidate():
                 conn.commit()
                 conn.close()
                 flash(
-                    "Password updated. Log in now.",
+                    "Password updated. If you are not currently "
+                    "logged in, log in now.",
                     "success",
                 )
                 return render_template("loginUser.html")
